@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>严哲堃 Brian Yan — Product Operations</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700;900&family=Bebas+Neue&display=swap');
+
+:root {
+  --black: #0a0a0a;
+  --white: #f5f2ed;
+  --acid: #c8ff00;
+  --acid2: #ff3c00;
+  --blue: #00c8ff;
+  --pink: #ff80ff;
+  --gray: #888;
+  --lgray: #d4d1cb;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  overflow-x: hidden;
+}
+
+/* CUSTOM CURSOR — only on real pointer devices, not touch */
+@media (pointer: fine) {
+  body, a, button, .pcard { cursor: none; }
+}
+.cur-dot {
+  position: fixed; z-index: 9999;
+  width: 10px; height: 10px;
+  background: var(--acid); border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: width 0.15s, height 0.15s;
+  will-change: left, top;
+  display: none;
+}
+.cur-ring {
+  position: fixed; z-index: 9998;
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--acid); border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: 0.45;
+  transition: width 0.2s, height 0.2s;
+  will-change: left, top;
+  display: none;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.4rem 3rem;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+}
+.nav-logo {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.72rem; color: var(--white);
+  letter-spacing: 0.12em; text-decoration: none;
+}
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.68rem; color: var(--white); text-decoration: none;
+  letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.65;
+  transition: opacity 0.2s;
+}
+.nav-links a:hover { opacity: 1; }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: flex-end;
+  padding: 0 3rem 5rem;
+  position: relative; overflow: hidden;
+}
+.hero-bg-word {
+  position: absolute; top: 50%; left: -1%;
+  transform: translateY(-50%);
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: clamp(100px, 16vw, 240px);
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(200,255,0,0.07);
+  white-space: nowrap; pointer-events: none; user-select: none;
+}
+.hero-photo {
+  position: absolute; right: 0; bottom: 0;
+  height: 90vh; width: 40%;
+  object-fit: cover; object-position: center top;
+  opacity: 0.9;
+  mask-image: linear-gradient(to left, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%);
+  pointer-events: none;
+}
+.hero-body { position: relative; z-index: 2; max-width: 55%; }
+.hero-eyebrow {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.68rem; letter-spacing: 0.2em; color: var(--acid);
+  text-transform: uppercase; margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.hero-eyebrow::before {
+  content: ''; display: inline-block;
+  width: 36px; height: 1px; background: var(--acid);
+}
+.hero-name {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: clamp(72px, 11vw, 160px);
+  line-height: 0.9; letter-spacing: -0.01em; margin-bottom: 1.8rem;
+}
+.hero-name .ac { color: var(--acid); }
+.hero-desc {
+  font-size: 1rem; line-height: 1.75; color: var(--lgray);
+  font-weight: 300; max-width: 520px; margin-bottom: 2.5rem;
+}
+.hero-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.htag {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.62rem; padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(200,255,0,0.35); color: var(--acid);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* TICKER */
+.ticker {
+  background: var(--acid); color: var(--black);
+  padding: 0.75rem 0; overflow: hidden; white-space: nowrap;
+}
+.ticker-track {
+  display: inline-block;
+  animation: tick 28s linear infinite;
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: 1.05rem; letter-spacing: 0.1em;
+}
+@keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* SECTION */
+.sec { padding: 6rem 3rem; }
+.sec-alt { background: #0d0d0d; }
+.sec-head {
+  display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 4rem;
+}
+.sec-num {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.68rem; color: var(--acid); letter-spacing: 0.1em;
+}
+.sec-title {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: clamp(38px, 5.5vw, 76px); line-height: 1; letter-spacing: 0.02em;
+}
+.sec-line { flex: 1; height: 1px; background: rgba(255,255,255,0.09); }
+
+/* STATS */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border: 1px solid rgba(255,255,255,0.07); margin-bottom: 5rem;
+}
+.stat {
+  padding: 2rem 1.8rem;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  transition: background 0.25s;
+}
+.stat:last-child { border-right: none; }
+.stat:hover { background: rgba(200,255,0,0.03); }
+.stat-n {
+  display: block;
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: 3.2rem; color: var(--acid); line-height: 1;
+}
+.stat-l {
+  display: block; margin-top: 0.4rem;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.6rem; color: var(--gray);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* PROJECT GRID */
+.pgrid {
+  display: grid; grid-template-columns: repeat(2,1fr);
+  gap: 1px; background: rgba(255,255,255,0.05);
+}
+.pcard {
+  background: var(--black); padding: 2.8rem;
+  position: relative; overflow: hidden; transition: background 0.3s;
+}
+.pcard:hover { background: rgba(200,255,0,0.025); }
+.pcard::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--acid); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.35s ease;
+}
+.pcard:hover::before { transform: scaleX(1); }
+.pcard.wide {
+  grid-column: span 2;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;
+}
+.pmeta { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem; }
+.pyear {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.62rem; color: var(--gray); letter-spacing: 0.08em;
+}
+.pcat {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.58rem; padding: 0.18rem 0.55rem;
+  border: 1px solid rgba(255,255,255,0.15); color: var(--lgray);
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.pcat.g { border-color: var(--acid); color: var(--acid); }
+.pcat.b { border-color: var(--blue); color: var(--blue); }
+.pcat.r { border-color: var(--acid2); color: var(--acid2); }
+.pcat.p { border-color: var(--pink); color: var(--pink); }
+.ptitle {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: clamp(26px, 3.2vw, 48px); line-height: 1;
+  margin-bottom: 1.1rem; letter-spacing: 0.02em;
+}
+.pdesc {
+  font-size: 0.87rem; line-height: 1.7; color: var(--lgray); font-weight: 300;
+}
+.pkpis { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.8rem; }
+.kpi-v {
+  display: block;
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: 2rem; color: var(--acid); line-height: 1;
+}
+.kpi-v.b { color: var(--blue); }
+.kpi-v.r { color: var(--acid2); }
+.kpi-v.p { color: var(--pink); }
+.kpi-d {
+  display: block; margin-top: 0.15rem;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.58rem; color: var(--gray);
+  text-transform: uppercase; letter-spacing: 0.07em;
+}
+.pbignum {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: clamp(90px, 11vw, 160px);
+  color: transparent; -webkit-text-stroke: 2px rgba(200,255,0,0.35);
+  line-height: 1; text-align: center; user-select: none;
+}
+.pbignum.red { -webkit-text-stroke-color: rgba(255,60,0,0.35); }
+.pbignum span { color: var(--acid); -webkit-text-stroke: 0; }
+.pbignum.red span { color: var(--acid2); }
+.parrow {
+  position: absolute; bottom: 2rem; right: 2rem;
+  font-size: 1.3rem; color: var(--acid);
+  opacity: 0; transform: translate(-4px,4px);
+  transition: opacity 0.25s, transform 0.25s;
+}
+.pcard:hover .parrow { opacity: 1; transform: translate(0,0); }
+
+/* EXPERIENCE */
+.exp-item {
+  display: grid; grid-template-columns: 190px 1px 1fr;
+  padding: 2.8rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.exp-item:last-child { border-bottom: none; }
+.exp-left { text-align: right; padding-right: 2rem; }
+.exp-co {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: 1.3rem; letter-spacing: 0.05em; display: block;
+}
+.exp-period {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.62rem; color: var(--gray); margin-top: 0.3rem; display: block;
+}
+.exp-mid {
+  width: 1px; background: rgba(255,255,255,0.1); position: relative;
+}
+.exp-mid::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 8px; height: 8px; background: var(--acid); border-radius: 50%;
+}
+.exp-right { padding-left: 2rem; }
+.exp-role {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.65rem; color: var(--acid);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.6rem; display: block;
+}
+.exp-head { font-size: 1.35rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.3; }
+.exp-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+.exp-list li {
+  font-size: 0.86rem; color: var(--lgray); line-height: 1.6;
+  font-weight: 300; padding-left: 1.1rem; position: relative;
+}
+.exp-list li::before {
+  content: '→'; position: absolute; left: 0; color: var(--acid); font-size: 0.72rem;
+}
+
+/* SKILLS */
+.sgrid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 1px; background: rgba(255,255,255,0.05);
+}
+.sblock {
+  background: var(--black); padding: 2.3rem; transition: background 0.25s;
+}
+.sblock:hover { background: rgba(200,255,0,0.03); }
+.sicon { font-size: 1.4rem; margin-bottom: 0.9rem; display: block; }
+.sname {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: 1.4rem; letter-spacing: 0.04em; margin-bottom: 0.9rem;
+}
+.stags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.stag {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.58rem; padding: 0.25rem 0.55rem;
+  background: rgba(255,255,255,0.04); color: var(--gray); letter-spacing: 0.04em;
+}
+
+/* ABOUT */
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+}
+.aphoto-wrap { position: relative; }
+.aphoto {
+  width: 100%; aspect-ratio: 3/4; object-fit: cover;
+  object-position: center top; display: block;
+}
+.aphoto-badge {
+  position: absolute; bottom: -1rem; right: -1rem;
+  background: var(--acid); color: var(--black);
+  padding: 0.9rem 1.4rem;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.5;
+}
+.atext h2 {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: clamp(38px, 5vw, 68px); line-height: 1; margin-bottom: 2rem;
+}
+.atext p {
+  font-size: 0.93rem; line-height: 1.8; color: var(--lgray);
+  font-weight: 300; margin-bottom: 1.4rem;
+}
+.atext .ac { color: var(--acid); font-weight: 400; }
+.alist { margin-top: 2rem; }
+.arow {
+  display: flex; align-items: center; gap: 1rem;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.67rem; letter-spacing: 0.04em; color: var(--lgray);
+  padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.arow-n { color: var(--acid); font-size: 0.58rem; min-width: 18px; }
+
+/* CONTACT */
+.contact-sec {
+  background: var(--acid); color: var(--black);
+  padding: 5rem 3rem; text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+}
+.ctitle {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: clamp(56px, 9vw, 130px);
+  line-height: 0.9; letter-spacing: -0.01em; margin-bottom: 1.8rem;
+}
+.csub {
+  font-size: 1rem; color: rgba(0,0,0,0.65);
+  font-weight: 300; margin-bottom: 2.8rem; max-width: 420px; line-height: 1.6;
+}
+.clinks { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; }
+.cbtn {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.75rem 1.8rem; border: 2px solid var(--black);
+  color: var(--black); text-decoration: none; transition: all 0.2s;
+}
+.cbtn:hover { background: var(--black); color: var(--acid); }
+
+/* FOOTER */
+footer {
+  padding: 1.8rem 3rem;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+footer span {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.62rem; color: var(--gray); letter-spacing: 0.04em;
+}
+
+/* REVEAL */
+.rv { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.rv.in { opacity: 1; transform: none; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .sec { padding: 4rem 1.5rem; }
+  .hero { padding: 0 1.5rem 3rem; }
+  .hero-body { max-width: 100%; }
+  .hero-photo { display: none; }
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .pgrid { grid-template-columns: 1fr; }
+  .pcard.wide { grid-column: span 1; grid-template-columns: 1fr; }
+  .pcard.wide .pbignum { display: none; }
+  .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .sgrid { grid-template-columns: 1fr; }
+  .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+  .exp-left { text-align: left; padding-right: 0; }
+  .exp-mid { display: none; }
+  .exp-right { padding-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cur-dot" id="curDot"></div>
+<div class="cur-ring" id="curRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">YAN.BRIANKUN</a>
+  <ul class="nav-links">
+    <li><a href="#work">作品</a></li>
+    <li><a href="#exp">经历</a></li>
+    <li><a href="#about">关于</a></li>
+    <li><a href="#contact">联系</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-word">PRODUCT OPERATIONS</div>
+  <img src="photo.jpeg" alt="严哲堃" class="hero-photo">
+  <div class="hero-body">
+    <div class="hero-eyebrow">Product Operations · GenAI · Content Ecosystem</div>
+    <h1 class="hero-name">严<span class="ac">哲</span>堃<br>BRIAN</h1>
+    <p class="hero-desc">用数据说话，用网感驱动增长。TikTok · Farfetch · 芒果TV 全链路实战经历，横跨 GenAI 评测、创作者生态与电商增长。</p>
+    <div class="hero-tags">
+      <span class="htag">GenAI 评测体系</span>
+      <span class="htag">创作者运营</span>
+      <span class="htag">A/B Test</span>
+      <span class="htag">漏斗分析</span>
+      <span class="htag">内容生态</span>
+      <span class="htag">从0到1</span>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">TIKTOK · FARFETCH · MANGO TV · R2GAMES · GENAI · CREATOR GROWTH · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;TIKTOK · FARFETCH · MANGO TV · R2GAMES · GENAI · CREATOR GROWTH · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;</div>
+</div>
+
+<!-- STATS -->
+<section class="sec" style="padding-bottom: 0;">
+  <div class="stats-row rv">
+    <div class="stat"><span class="stat-n">94%</span><span class="stat-l">GenAI 审核通过率（↑ from 35%）</span></div>
+    <div class="stat"><span class="stat-n">700%</span><span class="stat-l">大促 GMV 单次最高提升</span></div>
+    <div class="stat"><span class="stat-n">68%</span><span class="stat-l">尾部创作者流失率相对降低</span></div>
+    <div class="stat"><span class="stat-n">2×</span><span class="stat-l">Copilot 采纳率翻倍至 23%</span></div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="sec" id="work">
+  <div class="sec-head rv">
+    <span class="sec-num">01</span>
+    <h2 class="sec-title">SELECTED WORK</h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="pgrid">
+
+    <div class="pcard wide rv">
+      <div>
+        <div class="pmeta"><span class="pyear">2023 — 2024</span><span class="pcat g">GenAI</span></div>
+        <h3 class="ptitle">TIKTOK GENAI<br>评测体系</h3>
+        <p class="pdesc">面对模型生成质量不稳定的核心痛点，从0到1搭建样本池与标签体系，制定双周迭代验证标准与 A/B 评测口径，形成可复用 benchmark 流程。推动修复价格抓取失败、商品特征幻觉等高频问题，审核通过率从 35% 提升至 94%。</p>
+        <div class="pkpis">
+          <div><span class="kpi-v">35%→94%</span><span class="kpi-d">审核通过率</span></div>
+          <div><span class="kpi-v">0→1</span><span class="kpi-d">Benchmark 体系搭建</span></div>
+        </div>
+      </div>
+      <div class="pbignum"><span>94</span>%</div>
+      <div class="parrow">↗</div>
+    </div>
+
+    <div class="pcard rv">
+      <div class="pmeta"><span class="pyear">2023 — 2024</span><span class="pcat g">Prompt Eng.</span></div>
+      <h3 class="ptitle">COPILOT<br>采纳率优化</h3>
+      <p class="pdesc">围绕"创意生成/灵感给予"场景迭代 Prompt 与评测集，上线 thumb up 埋点辅助质量信号，采纳率从 11% 翻倍至 23%。</p>
+      <div class="pkpis">
+        <div><span class="kpi-v b">11%→23%</span><span class="kpi-d">采纳率翻倍</span></div>
+      </div>
+      <div class="parrow">↗</div>
+    </div>
+
+    <div class="pcard rv">
+      <div class="pmeta"><span class="pyear">2025</span><span class="pcat b">Creator Growth</span></div>
+      <h3 class="ptitle">创作者分层<br>增长策略</h3>
+      <p class="pdesc">针对头中尾三层创作者差异化激励，尾部首发任务降低流失，中部教育模板化提升稳定供给，CapCut 导入高阶创作者触达约 4 万。</p>
+      <div class="pkpis">
+        <div><span class="kpi-v b">-68%</span><span class="kpi-d">尾部流失率相对下降</span></div>
+        <div><span class="kpi-v b">4万</span><span class="kpi-d">创作者触达</span></div>
+      </div>
+      <div class="parrow">↗</div>
+    </div>
+
+    <div class="pcard rv">
+      <div class="pmeta"><span class="pyear">2025</span><span class="pcat p">Content Ops</span></div>
+      <h3 class="ptitle">爆款模板<br>热点机制</h3>
+      <p class="pdesc">搭建热点信号捕捉与周度复盘机制，统一输入池+促产日历+链路指标定位，将网感机制化，以 tungtungtung 等案例为代表推动高质爆款供给。</p>
+      <div class="pkpis">
+        <div><span class="kpi-v p">+32%</span><span class="kpi-d">高等级模板季度环比</span></div>
+        <div><span class="kpi-v p">+22%</span><span class="kpi-d">模板曝光月环比</span></div>
+      </div>
+      <div class="parrow">↗</div>
+    </div>
+
+    <div class="pcard wide rv">
+      <div>
+        <div class="pmeta"><span class="pyear">2023</span><span class="pcat r">E-Commerce</span></div>
+        <h3 class="ptitle">FARFETCH<br>KOC 双生态运营</h3>
+        <p class="pdesc">设计内容类与带货类双类型 KOC 任务包与激励规则，搭建跨团队大促 SOP 交付清单。内容侧扩声量，带货侧承接转化，8次大促单次 GMV 较基线提升 700%。同步挖掘并推动落地 3 条 T0 级产品需求。</p>
+        <div class="pkpis">
+          <div><span class="kpi-v r">+700%</span><span class="kpi-d">单次 GMV uplift</span></div>
+          <div><span class="kpi-v r">8次</span><span class="kpi-d">大促全链路落地</span></div>
+          <div><span class="kpi-v r">3条</span><span class="kpi-d">T0 产品需求推动</span></div>
+        </div>
+      </div>
+      <div class="pbignum red"><span>+7</span>×</div>
+      <div class="parrow">↗</div>
+    </div>
+
+    <div class="pcard rv">
+      <div class="pmeta"><span class="pyear">2022</span><span class="pcat p">Community</span></div>
+      <h3 class="ptitle">R2GAMES<br>社区增长</h3>
+      <p class="pdesc">策划评论区活动与内容分发，结构化收集 20+ 产品反馈推动 100% 迭代，平台活跃度（DAU）提升 219%。</p>
+      <div class="pkpis">
+        <div><span class="kpi-v p">+219%</span><span class="kpi-d">DAU 提升</span></div>
+      </div>
+      <div class="parrow">↗</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="sec sec-alt" id="exp">
+  <div class="sec-head rv">
+    <span class="sec-num">02</span>
+    <h2 class="sec-title">EXPERIENCE</h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="rv">
+    <div class="exp-item">
+      <div class="exp-left">
+        <span class="exp-co">字节跳动<br>TikTok</span>
+        <span class="exp-period">2025.03 — 2025.07</span>
+      </div>
+      <div class="exp-mid"></div>
+      <div class="exp-right">
+        <span class="exp-role">Product Operations · Shanghai</span>
+        <div class="exp-head">爆款运营 × 创作者增长</div>
+        <ul class="exp-list">
+          <li>搭建热点信号捕捉与周度复盘机制，输出促产日历，高质爆款模板等级季度环比 +32%</li>
+          <li>CapCut 导入高阶创作者触达约 4 万，沉淀私域核心创作者群 200–300 人</li>
+          <li>协助优化激励策略，尾部创作者流失率降低 68%</li>
+          <li>设计版本分层与升级激励，升级率 +38%，模板曝光量月环比 +22%</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-left">
+        <span class="exp-co">字节跳动<br>TikTok</span>
+        <span class="exp-period">2023.11 — 2024.04</span>
+      </div>
+      <div class="exp-mid"></div>
+      <div class="exp-right">
+        <span class="exp-role">Product Operations · Shanghai</span>
+        <div class="exp-head">GenAI 评测 × Copilot 优化</div>
+        <ul class="exp-list">
+          <li>从0到1搭建 GenAI 样本池与标签体系，审核通过率 35% → 94%</li>
+          <li>迭代 Copilot Prompt 与评测集，采纳率从 11% 翻倍至 23%</li>
+          <li>制定双周迭代验证标准与 A/B 评测口径，形成可复用 benchmark 流程</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-left">
+        <span class="exp-co">Farfetch<br>发发奇</span>
+        <span class="exp-period">2023.08 — 2023.11</span>
+      </div>
+      <div class="exp-mid"></div>
+      <div class="exp-right">
+        <span class="exp-role">Product Operations · Shanghai</span>
+        <div class="exp-head">KOC 全链路运营</div>
+        <ul class="exp-list">
+          <li>策划 8 次大促，单次 GMV 较活动前基线提升 700%</li>
+          <li>撰写 80+ 激励文章，监测与优化 KOC 激励规则</li>
+          <li>从0到1制定并迭代小红书运营 SOP，挖掘 3 条 T0 级产品需求推动落地</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-left">
+        <span class="exp-co">芒果 TV</span>
+        <span class="exp-period">2023.05 — 2023.08</span>
+      </div>
+      <div class="exp-mid"></div>
+      <div class="exp-right">
+        <span class="exp-role">Marketing · Changsha</span>
+        <div class="exp-head">综艺项目营销支持</div>
+        <ul class="exp-list">
+          <li>从0到1输出营销手册及招商 PPT 初版</li>
+          <li>结合数据与深访输出 2000+ 字用户画像与竞品分析报告</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-left">
+        <span class="exp-co">R2Games</span>
+        <span class="exp-period">2022.06 — 2022.09</span>
+      </div>
+      <div class="exp-mid"></div>
+      <div class="exp-right">
+        <span class="exp-role">Product Operations · Shenzhen</span>
+        <div class="exp-head">社区内容运营</div>
+        <ul class="exp-list">
+          <li>策划评论区活动，平台活跃度（DAU）提升 219%</li>
+          <li>撰写 10+ 游戏推文脚本，总点击 10 万+，互动率 ≥ 0.5%</li>
+          <li>结构化收集 20+ 产品反馈并推动 100% 问题迭代</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="sec" id="skills">
+  <div class="sec-head rv">
+    <span class="sec-num">03</span>
+    <h2 class="sec-title">SKILLS</h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="sgrid rv">
+    <div class="sblock">
+      <span class="sicon">⚡</span>
+      <div class="sname">数据分析</div>
+      <div class="stags">
+        <span class="stag">A/B Test</span><span class="stag">漏斗分析</span>
+        <span class="stag">指标拆解</span><span class="stag">Jamovi</span><span class="stag">Excel</span>
+      </div>
+    </div>
+    <div class="sblock">
+      <span class="sicon">🤖</span>
+      <div class="sname">GenAI 产品</div>
+      <div class="stags">
+        <span class="stag">Prompt Engineering</span><span class="stag">Benchmark 搭建</span>
+        <span class="stag">质量评测体系</span><span class="stag">幻觉问题定位</span>
+      </div>
+    </div>
+    <div class="sblock">
+      <span class="sicon">📈</span>
+      <div class="sname">增长运营</div>
+      <div class="stags">
+        <span class="stag">创作者分层</span><span class="stag">激励设计</span>
+        <span class="stag">供给侧策略</span><span class="stag">GMV 增长</span>
+      </div>
+    </div>
+    <div class="sblock">
+      <span class="sicon">🎯</span>
+      <div class="sname">内容运营</div>
+      <div class="stags">
+        <span class="stag">热点捕捉</span><span class="stag">爆款机制化</span>
+        <span class="stag">小红书运营</span><span class="stag">KOC/KOL 生态</span>
+      </div>
+    </div>
+    <div class="sblock">
+      <span class="sicon">🔧</span>
+      <div class="sname">产品支持</div>
+      <div class="stags">
+        <span class="stag">需求挖掘</span><span class="stag">SOP 搭建</span>
+        <span class="stag">跨团队协同</span><span class="stag">Axure · Figma</span>
+      </div>
+    </div>
+    <div class="sblock">
+      <span class="sicon">🌍</span>
+      <div class="sname">语言 / 学历</div>
+      <div class="stags">
+        <span class="stag">中文 母语</span><span class="stag">IELTS 7.5</span>
+        <span class="stag">Uppsala Univ. 硕士</span>
+        <span class="stag">台湾大学交换</span><span class="stag">剑桥访学</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="sec sec-alt" id="about">
+  <div class="sec-head rv">
+    <span class="sec-num">04</span>
+    <h2 class="sec-title">ABOUT</h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="about-grid rv">
+    <div class="aphoto-wrap">
+      <img src="photo.jpeg" alt="严哲堃" class="aphoto">
+      <div class="aphoto-badge">Product Operations<br>2022 — Present</div>
+    </div>
+    <div class="atext">
+      <h2>从网感<br>到系统</h2>
+      <p>我是严哲堃，一名横跨 GenAI、电商与内容生态的产品运营。拥有 TikTok、Farfetch、芒果TV 等头部平台的完整实战经验，擅长把分散的网感变成可复用的机制，把业务增长目标拆解为可落地的数据闭环。</p>
+      <p>我相信最好的运营是「既懂用户，又看数据」——用 A/B Test 验证直觉，用漏斗分析找到掉点，用 SOP 让成功可以复制。目前于瑞典乌普萨拉大学攻读数字媒体硕士，持续关注 AI 时代的人机协作与内容生产变革。</p>
+      <p class="ac">小红书职场类内容 3月、6月全网第一 · 私域用户 500+</p>
+      <div class="alist">
+        <div class="arow"><span class="arow-n">①</span>乌普萨拉大学 数字媒体硕士（全额奖学金）</div>
+        <div class="arow"><span class="arow-n">②</span>台湾大学交换 · 英国剑桥大学访学</div>
+        <div class="arow"><span class="arow-n">③</span>武汉轻工大学 广告学 GPA 年级 top 5%</div>
+        <div class="arow"><span class="arow-n">④</span>发表两篇期刊（CPCI 国家级刊物）</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div class="contact-sec" id="contact">
+  <div class="ctitle">LET'S<br>CONNECT</div>
+  <p class="csub">正在寻找产品运营 / 用户增长 / 市场机会，欢迎 reach！微信手机同号</p>
+  <div class="clinks">
+    <a href="mailto:briankun2022@163.com" class="cbtn">briankun2022@163.com</a>
+    <a href="tel:+8615772288557" class="cbtn">157-7228-8557</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 严哲堃 Brian Yan</span>
+  <span>Product Operations · GenAI · Content Ecosystem</span>
+</footer>
+
+<script>
+// Custom cursor — only on real pointer devices
+if (window.matchMedia('(pointer: fine)').matches) {
+  const dot = document.getElementById('curDot');
+  const ring = document.getElementById('curRing');
+  dot.style.display = 'block';
+  ring.style.display = 'block';
+
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top  = my + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx) * 0.13;
+    ry += (my - ry) * 0.13;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a, button, .pcard, .stat, .sblock').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      dot.style.width = '6px'; dot.style.height = '6px';
+      ring.style.width = '54px'; ring.style.height = '54px';
+      ring.style.opacity = '0.7';
+    });
+    el.addEventListener('mouseleave', () => {
+      dot.style.width = '10px'; dot.style.height = '10px';
+      ring.style.width = '36px'; ring.style.height = '36px';
+      ring.style.opacity = '0.45';
+    });
+  });
+}
+
+// Scroll reveal
+const els = document.querySelectorAll('.rv');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('in'), i * 60);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+els.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
