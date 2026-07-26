@@ -174,6 +174,7 @@ nav {
   display: block;
   font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
   font-size: 3.2rem; color: var(--acid); line-height: 1;
+  white-space: nowrap;
 }
 .stat-l {
   display: block; margin-top: 0.4rem;
@@ -247,8 +248,10 @@ nav {
   line-height: 1; text-align: center; user-select: none;
 }
 .pbignum.red { -webkit-text-stroke-color: rgba(255,60,0,0.35); }
+.pbignum.blue { -webkit-text-stroke-color: rgba(0,200,255,0.35); }
 .pbignum span { color: var(--acid); -webkit-text-stroke: 0; }
 .pbignum.red span { color: var(--acid2); }
+.pbignum.blue span { color: var(--blue); }
 .parrow {
   position: absolute; bottom: 2rem; right: 2rem;
   font-size: 1.3rem; color: var(--acid);
@@ -433,10 +436,11 @@ footer span {
   <div class="hero-bg-word">PRODUCT OPERATIONS</div>
   <img src="photo.jpeg" alt="严哲堃" class="hero-photo">
   <div class="hero-body">
-    <div class="hero-eyebrow">Product Operations · GenAI · Content Ecosystem</div>
+    <div class="hero-eyebrow">Product Operations · Trust &amp; Safety · GenAI · Content Ecosystem</div>
     <h1 class="hero-name">严<span class="ac">哲</span>堃<br>BRIAN</h1>
-    <p class="hero-desc">用数据说话，用网感驱动增长。TikTok · Farfetch · 芒果TV 全链路实战经历，横跨 GenAI 评测、创作者生态与电商增长。</p>
+    <p class="hero-desc">用数据说话，用网感驱动增长。微信视频号 · TikTok · Farfetch · 芒果TV 全链路实战经历，横跨安全治理、GenAI 评测、创作者生态与电商增长。</p>
     <div class="hero-tags">
+      <span class="htag">安全治理</span>
       <span class="htag">GenAI 评测体系</span>
       <span class="htag">创作者运营</span>
       <span class="htag">A/B Test</span>
@@ -449,16 +453,16 @@ footer span {
 
 <!-- TICKER -->
 <div class="ticker">
-  <div class="ticker-track">TIKTOK · FARFETCH · MANGO TV · R2GAMES · GENAI · CREATOR GROWTH · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;TIKTOK · FARFETCH · MANGO TV · R2GAMES · GENAI · CREATOR GROWTH · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;</div>
+  <div class="ticker-track">WECHAT CHANNELS · TIKTOK · FARFETCH · MANGO TV · TRUST &amp; SAFETY · GENAI · CREATOR GROWTH · 2W/DAY · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;WECHAT CHANNELS · TIKTOK · FARFETCH · MANGO TV · TRUST &amp; SAFETY · GENAI · CREATOR GROWTH · 2W/DAY · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;</div>
 </div>
 
 <!-- STATS -->
 <section class="sec" style="padding-bottom: 0;">
   <div class="stats-row rv">
+    <div class="stat"><span class="stat-n">2万/天</span><span class="stat-l">视频号侵权投诉处置量级</span></div>
     <div class="stat"><span class="stat-n">94%</span><span class="stat-l">GenAI 审核通过率（↑ from 35%）</span></div>
     <div class="stat"><span class="stat-n">700%</span><span class="stat-l">大促 GMV 单次最高提升</span></div>
     <div class="stat"><span class="stat-n">68%</span><span class="stat-l">尾部创作者流失率相对降低</span></div>
-    <div class="stat"><span class="stat-n">2×</span><span class="stat-l">Copilot 采纳率翻倍至 23%</span></div>
   </div>
 </section>
 
@@ -470,6 +474,21 @@ footer span {
     <div class="sec-line"></div>
   </div>
   <div class="pgrid">
+
+    <div class="pcard wide rv">
+      <div>
+        <div class="pmeta"><span class="pyear">2026 — 至今</span><span class="pcat b">Trust &amp; Safety</span></div>
+        <h3 class="ptitle">微信视频号<br>侵权投诉治理</h3>
+        <p class="pdesc">面向名人身份仿冒等高敏投诉场景，从0到1收敛「高可信权利人识别 - 秒级临时止损 - 处置结果透传」产品方案，覆盖账号与内容两类投诉。梳理处罚原因/动作/优先级与文案映射，完成透传与通知去重规则，两项功能已推全，累计推动 10+ 功能/数据/设计需求落地。</p>
+        <div class="pkpis">
+          <div><span class="kpi-v b">2万/天</span><span class="kpi-d">投诉处置影响量级</span></div>
+          <div><span class="kpi-v b">10+</span><span class="kpi-d">功能 / 数据 / 设计需求</span></div>
+          <div><span class="kpi-v b">秒级</span><span class="kpi-d">临时止损响应</span></div>
+        </div>
+      </div>
+      <div class="pbignum blue"><span>2</span>万</div>
+      <div class="parrow">↗</div>
+    </div>
 
     <div class="pcard wide rv">
       <div>
@@ -553,6 +572,23 @@ footer span {
     <div class="sec-line"></div>
   </div>
   <div class="rv">
+    <div class="exp-item">
+      <div class="exp-left">
+        <span class="exp-co">腾讯<br>微信视频号</span>
+        <span class="exp-period">2026.05 — 至今</span>
+      </div>
+      <div class="exp-mid"></div>
+      <div class="exp-right">
+        <span class="exp-role">Product Operations · Guangzhou</span>
+        <div class="exp-head">安全治理 × 侵权投诉闭环</div>
+        <ul class="exp-list">
+          <li>负责名人身份仿冒等高敏投诉治理，收敛为「高可信权利人识别 - 秒级临时止损 - 处置结果透传」方案，覆盖账号与内容两类场景，影响量级约 2 万单/天</li>
+          <li>梳理处罚原因 / 动作 / 优先级与用户侧文案映射，完成透传策略与通知去重规则，两项功能已推全</li>
+          <li>累计推动 10+ 功能 / 数据 / 设计需求，定义命中量、下发率、成功率、兜底占比等上线后监控口径</li>
+          <li>探索海外视频号供给侧增长，修正海外用户识别口径，定位 HK、MY 等潜力区域，支撑业务进入决策</li>
+        </ul>
+      </div>
+    </div>
     <div class="exp-item">
       <div class="exp-left">
         <span class="exp-co">字节跳动<br>TikTok</span>
@@ -677,11 +713,20 @@ footer span {
       </div>
     </div>
     <div class="sblock">
+      <span class="sicon">🛡️</span>
+      <div class="sname">安全治理</div>
+      <div class="stags">
+        <span class="stag">侵权投诉闭环</span><span class="stag">权利人识别</span>
+        <span class="stag">处罚规则建模</span><span class="stag">上线监控口径</span>
+      </div>
+    </div>
+    <div class="sblock">
       <span class="sicon">🔧</span>
       <div class="sname">产品支持</div>
       <div class="stags">
         <span class="stag">需求挖掘</span><span class="stag">SOP 搭建</span>
         <span class="stag">跨团队协同</span><span class="stag">Axure · Figma</span>
+        <span class="stag">Codex</span><span class="stag">Xmind · Blender</span>
       </div>
     </div>
     <div class="sblock">
@@ -690,7 +735,7 @@ footer span {
       <div class="stags">
         <span class="stag">中文 母语</span><span class="stag">IELTS 7.5</span>
         <span class="stag">Uppsala Univ. 硕士</span>
-        <span class="stag">台湾大学交换</span><span class="stag">剑桥访学</span>
+        <span class="stag">台大交换 3A+</span><span class="stag">剑桥访学</span>
       </div>
     </div>
   </div>
@@ -710,12 +755,12 @@ footer span {
     </div>
     <div class="atext">
       <h2>从网感<br>到系统</h2>
-      <p>我是严哲堃，一名横跨 GenAI、电商与内容生态的产品运营。拥有 TikTok、Farfetch、芒果TV 等头部平台的完整实战经验，擅长把分散的网感变成可复用的机制，把业务增长目标拆解为可落地的数据闭环。</p>
-      <p>我相信最好的运营是「既懂用户，又看数据」——用 A/B Test 验证直觉，用漏斗分析找到掉点，用 SOP 让成功可以复制。目前于瑞典乌普萨拉大学攻读数字媒体硕士，持续关注 AI 时代的人机协作与内容生产变革。</p>
-      <p class="ac">小红书职场类内容 3月、6月全网第一 · 私域用户 500+</p>
+      <p>我是严哲堃，一名横跨安全治理、GenAI、电商与内容生态的产品运营。拥有微信视频号、TikTok、Farfetch、芒果TV 等头部平台的完整实战经验，擅长把分散的网感变成可复用的机制，把业务目标拆解为可落地的数据闭环。</p>
+      <p>我相信最好的运营是「既懂用户，又看数据」——用 A/B Test 验证直觉，用漏斗分析找到掉点，用 SOP 让成功可以复制。目前在微信视频号负责名人侵权投诉治理与海外机会探索，同时于瑞典乌普萨拉大学攻读数字媒体硕士，持续关注 AI 时代的人机协作与内容生产变革。</p>
+      <p class="ac">小红书职场类内容 3月、6月全网第一 · 私域用户 500+ · 小宇宙深度对谈主理人</p>
       <div class="alist">
-        <div class="arow"><span class="arow-n">①</span>乌普萨拉大学 数字媒体硕士（全额奖学金）</div>
-        <div class="arow"><span class="arow-n">②</span>台湾大学交换 · 英国剑桥大学访学</div>
+        <div class="arow"><span class="arow-n">①</span>乌普萨拉大学 数字媒体硕士（全额奖学金，2024 — 2026.12）</div>
+        <div class="arow"><span class="arow-n">②</span>台湾大学交换 满修优评 3A+/3A/A- · 英国剑桥大学访学</div>
         <div class="arow"><span class="arow-n">③</span>武汉轻工大学 广告学 GPA 年级 top 5%</div>
         <div class="arow"><span class="arow-n">④</span>发表两篇期刊（CPCI 国家级刊物）</div>
       </div>
@@ -730,13 +775,15 @@ footer span {
   <div class="clinks">
     <a href="mailto:briankun2022@163.com" class="cbtn">briankun2022@163.com</a>
     <a href="tel:+8615772288557" class="cbtn">157-7228-8557</a>
+    <a href="https://www.xiaoyuzhoufm.com/podcast/695b427fbf09b17285d3e096" target="_blank" rel="noopener" class="cbtn">小宇宙 播客</a>
+    <a href="https://xhslink.cn/m/38jP0KqAzez" target="_blank" rel="noopener" class="cbtn">小红书 主页</a>
   </div>
 </div>
 
 <!-- FOOTER -->
 <footer>
   <span>© 2026 严哲堃 Brian Yan</span>
-  <span>Product Operations · GenAI · Content Ecosystem</span>
+  <span>Product Operations · Trust &amp; Safety · GenAI · Content Ecosystem</span>
 </footer>
 
 <script>
