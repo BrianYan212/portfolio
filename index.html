@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>严哲堃 Brian Yan — Product Operations</title>
+<title>严哲堃Brian Yan — Product Operations</title>
+<meta name="description" content="严哲堃 Brian Yan — 横跨安全治理、GenAI 评测、创作者生态与电商增长的产品运营。微信视频号 · TikTok · Farfetch · 芒果TV 全链路实战。">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700;900&family=Bebas+Neue&display=swap');
 
@@ -27,6 +28,7 @@ body {
   font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   overflow-x: hidden;
 }
+body.locked { overflow: hidden; }
 
 /* CUSTOM CURSOR — only on real pointer devices, not touch */
 @media (pointer: fine) {
@@ -90,6 +92,7 @@ nav {
   color: transparent;
   -webkit-text-stroke: 1px rgba(200,255,0,0.07);
   white-space: nowrap; pointer-events: none; user-select: none;
+  will-change: transform;
 }
 .hero-photo {
   position: absolute; right: 0; bottom: 0;
@@ -99,6 +102,7 @@ nav {
   mask-image: linear-gradient(to left, black 50%, transparent 100%);
   -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%);
   pointer-events: none;
+  will-change: transform;
 }
 .hero-body { position: relative; z-index: 2; max-width: 55%; }
 .hero-eyebrow {
@@ -117,6 +121,7 @@ nav {
   line-height: 0.9; letter-spacing: -0.01em; margin-bottom: 1.8rem;
 }
 .hero-name .ac { color: var(--acid); }
+.hero-name .char { display: inline-block; will-change: transform, opacity; }
 .hero-desc {
   font-size: 1rem; line-height: 1.75; color: var(--lgray);
   font-weight: 300; max-width: 520px; margin-bottom: 2.5rem;
@@ -128,6 +133,14 @@ nav {
   border: 1px solid rgba(200,255,0,0.35); color: var(--acid);
   letter-spacing: 0.08em; text-transform: uppercase;
 }
+.scroll-hint {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  font-family: 'Space Mono', monospace; font-size: 0.58rem;
+  color: var(--gray); letter-spacing: 0.15em; text-transform: uppercase;
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  z-index: 2;
+}
+.scroll-hint .line { width: 1px; height: 34px; background: linear-gradient(var(--acid), transparent); }
 
 /* TICKER */
 .ticker {
@@ -136,11 +149,10 @@ nav {
 }
 .ticker-track {
   display: inline-block;
-  animation: tick 28s linear infinite;
   font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
   font-size: 1.05rem; letter-spacing: 0.1em;
+  will-change: transform;
 }
-@keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* SECTION */
 .sec { padding: 6rem 3rem; }
@@ -156,7 +168,7 @@ nav {
   font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
   font-size: clamp(38px, 5.5vw, 76px); line-height: 1; letter-spacing: 0.02em;
 }
-.sec-line { flex: 1; height: 1px; background: rgba(255,255,255,0.09); }
+.sec-line { flex: 1; height: 1px; background: rgba(255,255,255,0.09); transform-origin: left; }
 
 /* STATS */
 .stats-row {
@@ -192,6 +204,7 @@ nav {
   background: var(--black); padding: 2.8rem;
   position: relative; overflow: hidden; transition: background 0.3s;
 }
+.pcard[data-detail] { cursor: pointer; }
 .pcard:hover { background: rgba(200,255,0,0.025); }
 .pcard::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -252,6 +265,18 @@ nav {
 .pbignum span { color: var(--acid); -webkit-text-stroke: 0; }
 .pbignum.red span { color: var(--acid2); }
 .pbignum.blue span { color: var(--blue); }
+/* detail affordance */
+.pmore {
+  display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.8rem;
+  font-family: 'Space Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--acid);
+  opacity: 0.7; transition: opacity 0.2s, gap 0.2s;
+}
+.pcard:hover .pmore { opacity: 1; gap: 0.85rem; }
+.pmore .box {
+  width: 20px; height: 20px; border: 1px solid var(--acid);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;
+}
 .parrow {
   position: absolute; bottom: 2rem; right: 2rem;
   font-size: 1.3rem; color: var(--acid);
@@ -389,9 +414,155 @@ footer span {
   font-size: 0.62rem; color: var(--gray); letter-spacing: 0.04em;
 }
 
-/* REVEAL */
-.rv { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
-.rv.in { opacity: 1; transform: none; }
+/* ============半开屏抽屉式 详情弹窗 ============ */
+.drawer-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(5,5,5,0.72);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+.drawer-overlay.open { pointer-events: auto; }
+.drawer {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 501;
+  height: 86vh; max-height: 86vh;
+  background: #0c0c0c;
+  border-top: 2px solid var(--acid);
+  box-shadow: 0 -30px 80px rgba(0,0,0,0.6);
+  transform: translateY(100%);
+  display: flex; flex-direction: column;
+  will-change: transform;
+}
+.drawer-grip {
+  flex-shrink: 0; padding: 0.9rem 0 0.4rem; display: flex; justify-content: center;
+  cursor: pointer;
+}
+.drawer-grip span { width: 46px; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.25); display: block; }
+.drawer-top {
+  flex-shrink: 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 0.6rem 3rem 1.6rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.drawer-eyebrow {
+  font-family: 'Space Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--acid);
+  display: flex; gap: 0.9rem; align-items: center; margin-bottom: 0.9rem; flex-wrap: wrap;
+}
+.drawer-eyebrow .dcat { padding: 0.15rem 0.55rem; border: 1px solid currentColor; }
+.drawer-title {
+  font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
+  font-size: clamp(32px, 4.5vw, 60px); line-height: 0.98; letter-spacing: 0.02em;
+}
+.drawer-close {
+  flex-shrink: 0; margin-left: 2rem;
+  width: 48px; height: 48px; border: 1px solid rgba(255,255,255,0.2);
+  background: transparent; color: var(--white);
+  font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; font-family: 'Space Mono', monospace;
+}
+.drawer-close:hover { background: var(--acid); color: var(--black); border-color: var(--acid); }
+.drawer-scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 2.4rem 3rem 4rem;
+  scrollbar-width: thin; scrollbar-color: rgba(200,255,0,0.4) transparent;
+}
+.drawer-scroll::-webkit-scrollbar { width: 8px; }
+.drawer-scroll::-webkit-scrollbar-thumb { background: rgba(200,255,0,0.35); border-radius: 4px; }
+.drawer-scroll::-webkit-scrollbar-track { background: transparent; }
+
+.d-lede {
+  font-size: 1.05rem; line-height: 1.8; color: var(--white); font-weight: 300;
+  max-width: 760px; margin-bottom: 2.8rem;
+  padding-left: 1.2rem; border-left: 3px solid var(--acid);
+}
+.d-lede .ac { color: var(--acid); }
+
+.d-block { margin-bottom: 2.8rem; }
+.d-block > .d-h {
+  font-family: 'Space Mono', monospace; font-size: 0.66rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--acid);
+  margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem;
+}
+.d-block > .d-h::before {
+  content: ''; width: 22px; height: 1px; background: var(--acid); display: inline-block;
+}
+
+/* 四段/流程 步骤条 */
+.d-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,0.06); }
+.d-step { background: #0c0c0c; padding: 1.5rem 1.3rem; position: relative; }
+.d-step .num {
+  font-family: 'Space Mono', monospace; font-size: 0.58rem; color: var(--gray);
+  letter-spacing: 0.1em; margin-bottom: 0.7rem; display: block;
+}
+.d-step .st-t {
+  font-family: 'Bebas Neue', Impact, sans-serif; font-size: 1.15rem;
+  letter-spacing: 0.03em; margin-bottom: 0.6rem; color: var(--white);
+}
+.d-step .st-d { font-size: 0.78rem; line-height: 1.6; color: var(--lgray); font-weight: 300; }
+.d-step::after {
+  content: '→'; position: absolute; top: 1.5rem; right: -0.55rem; color: var(--acid);
+  font-size: 0.8rem; z-index: 2;
+}
+.d-step:last-child::after { display: none; }
+
+/* 两列要点 */
+.d-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem 2.4rem; }
+.d-point { }
+.d-point .pt-t {
+  font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem;
+  display: flex; align-items: baseline; gap: 0.6rem;
+}
+.d-point .pt-t .tick { color: var(--acid); font-family: 'Space Mono', monospace; font-size: 0.7rem; }
+.d-point .pt-d { font-size: 0.82rem; line-height: 1.65; color: var(--lgray); font-weight: 300; }
+
+/* 指标条 */
+.d-metrics { display: flex; flex-wrap: wrap; gap: 1px; background: rgba(255,255,255,0.06); }
+.d-metric {
+  background: #0c0c0c; padding: 1.3rem 1.6rem; flex: 1; min-width: 140px;
+}
+.d-metric .m-v {
+  font-family: 'Bebas Neue', Impact, sans-serif; font-size: 2.1rem; line-height: 1;
+  color: var(--acid);
+}
+.d-metric.b .m-v { color: var(--blue); }
+.d-metric.r .m-v { color: var(--acid2); }
+.d-metric.p .m-v { color: var(--pink); }
+.d-metric .m-d {
+  font-family: 'Space Mono', monospace; font-size: 0.58rem; color: var(--gray);
+  letter-spacing: 0.06em; text-transform: uppercase; margin-top: 0.4rem; line-height: 1.4;
+}
+
+/* 普通要点列表 */
+.d-ul { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+.d-ul li {
+  font-size: 0.87rem; line-height: 1.7; color: var(--lgray); font-weight: 300;
+  padding-left: 1.4rem; position: relative;
+}
+.d-ul li::before { content: '▹'; position: absolute; left: 0; color: var(--acid); }
+.d-ul li strong { color: var(--white); font-weight: 700; }
+
+/* 边界 / 护栏提示框 */
+.d-note {
+  border: 1px solid rgba(200,255,0,0.25); background: rgba(200,255,0,0.03);
+  padding: 1.3rem 1.5rem; font-size: 0.82rem; line-height: 1.7;
+  color: var(--lgray); font-weight: 300;
+}
+.d-note .nt {
+  font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--acid); display: block; margin-bottom: 0.6rem;
+}
+
+.d-tagrow { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
+.d-tag {
+  font-family: 'Space Mono', monospace; font-size: 0.6rem;
+  padding: 0.3rem 0.7rem; border: 1px solid rgba(255,255,255,0.15);
+  color: var(--lgray); letter-spacing: 0.05em;
+}
+.d-anim { opacity: 0; } /* GSAP will reveal */
+
+/* REVEAL fallback (no-JS / reduced motion) */
+.rv { opacity: 0; transform: translateY(28px); }
+.no-anim .rv, .rv.in { opacity: 1; transform: none; }
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
@@ -411,6 +582,17 @@ footer span {
   .exp-left { text-align: left; padding-right: 0; }
   .exp-mid { display: none; }
   .exp-right { padding-left: 0; }
+  /* drawer mobile */
+  .drawer { height: 92vh; max-height: 92vh; }
+  .drawer-top { padding: 0.6rem 1.4rem 1.3rem; }
+  .drawer-scroll { padding: 1.8rem 1.4rem 3.5rem; }
+  .d-flow { grid-template-columns: 1fr 1fr; }
+  .d-step::after { display: none; }
+  .d-cols { grid-template-columns: 1fr; }
+  .d-metric { min-width: 45%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
 </style>
 </head>
@@ -437,7 +619,7 @@ footer span {
   <img src="photo.jpeg" alt="严哲堃" class="hero-photo">
   <div class="hero-body">
     <div class="hero-eyebrow">Product Operations · Trust &amp; Safety · GenAI · Content Ecosystem</div>
-    <h1 class="hero-name">严<span class="ac">哲</span>堃<br>BRIAN</h1>
+    <h1 class="hero-name" id="heroName">严<span class="ac">哲</span>堃<br>BRIAN</h1>
     <p class="hero-desc">用数据说话，用网感驱动增长。微信视频号 · TikTok · Farfetch · 芒果TV 全链路实战经历，横跨安全治理、GenAI 评测、创作者生态与电商增长。</p>
     <div class="hero-tags">
       <span class="htag">安全治理</span>
@@ -449,20 +631,21 @@ footer span {
       <span class="htag">从0到1</span>
     </div>
   </div>
+  <div class="scroll-hint"><span>SCROLL</span><span class="line"></span></div>
 </section>
 
 <!-- TICKER -->
 <div class="ticker">
-  <div class="ticker-track">WECHAT CHANNELS · TIKTOK · FARFETCH · MANGO TV · TRUST &amp; SAFETY · GENAI · CREATOR GROWTH · 2W/DAY · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;WECHAT CHANNELS · TIKTOK · FARFETCH · MANGO TV · TRUST &amp; SAFETY · GENAI · CREATOR GROWTH · 2W/DAY · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;</div>
+  <div class="ticker-track" id="tickerTrack">WECHAT CHANNELS · TIKTOK · FARFETCH · MANGO TV · TRUST &amp; SAFETY · GENAI · CREATOR GROWTH · GMV +700% · PASS RATE 35→94% · ADOPTION RATE ×2 · CONTENT ECOSYSTEM · PRODUCT OPERATIONS &nbsp;&nbsp;&nbsp;</div>
 </div>
 
 <!-- STATS -->
 <section class="sec" style="padding-bottom: 0;">
   <div class="stats-row rv">
-    <div class="stat"><span class="stat-n">2万/天</span><span class="stat-l">视频号侵权投诉处置量级</span></div>
-    <div class="stat"><span class="stat-n">94%</span><span class="stat-l">GenAI 审核通过率（↑ from 35%）</span></div>
-    <div class="stat"><span class="stat-n">700%</span><span class="stat-l">大促 GMV 单次最高提升</span></div>
-    <div class="stat"><span class="stat-n">68%</span><span class="stat-l">尾部创作者流失率相对降低</span></div>
+    <div class="stat"><span class="stat-n"><span class="count" data-to="3758" data-suffix="">0</span>单/天</span><span class="stat-l">身份仿冒/肖像投诉 目标入口日均</span></div>
+    <div class="stat"><span class="stat-n"><span class="count" data-to="94" data-suffix="%">0</span></span><span class="stat-l">GenAI 送审通过率（↑ from 35%）</span></div>
+    <div class="stat"><span class="stat-n">+<span class="count" data-to="700" data-suffix="%">0</span></span><span class="stat-l">大促 GMV 单次最高提升</span></div>
+    <div class="stat"><span class="stat-n"><span class="count" data-to="68" data-suffix="%">0</span></span><span class="stat-l">尾部创作者流失率相对降低</span></div>
   </div>
 </section>
 
@@ -475,89 +658,109 @@ footer span {
   </div>
   <div class="pgrid">
 
-    <div class="pcard wide rv">
+    <div class="pcard wide rv" data-detail="tencent">
       <div>
         <div class="pmeta"><span class="pyear">2026 — 至今</span><span class="pcat b">Trust &amp; Safety</span></div>
-        <h3 class="ptitle">微信视频号<br>侵权投诉治理</h3>
-        <p class="pdesc">面向名人身份仿冒等高敏投诉场景，从0到1收敛「高可信权利人识别 - 秒级临时止损 - 处置结果透传」产品方案，覆盖账号与内容两类投诉。梳理处罚原因/动作/优先级与文案映射，完成透传与通知去重规则，两项功能已推全，累计推动 10+ 功能/数据/设计需求落地。</p>
+        <h3 class="ptitle">微信视频号<br>投诉后可感知治理闭环</h3>
+        <p class="pdesc">面向身份仿冒与肖像侵权场景，把权利人「投诉后进入黑箱」的等待与模糊反馈，重构为账号状态外显 → 高可信识别与可逆止损 → 结单结果透传 → 满意度与行为验证的四段闭环。定义母题与规则，完成对象建模、去重、解除与处罚映射，推动设计/研发/策略/测试/数据协同落地。</p>
         <div class="pkpis">
-          <div><span class="kpi-v b">2万/天</span><span class="kpi-d">投诉处置影响量级</span></div>
+          <div><span class="kpi-v b">4段</span><span class="kpi-d">用户时刻闭环</span></div>
           <div><span class="kpi-v b">10+</span><span class="kpi-d">功能 / 数据 / 设计需求</span></div>
-          <div><span class="kpi-v b">秒级</span><span class="kpi-d">临时止损响应</span></div>
+          <div><span class="kpi-v b">可逆</span><span class="kpi-d">等待期先行止损</span></div>
         </div>
+        <span class="pmore"><span class="box">+</span>展开项目深读</span>
       </div>
-      <div class="pbignum blue"><span>2</span>万</div>
+      <div class="pbignum blue"><span>4</span>段</div>
       <div class="parrow">↗</div>
     </div>
 
-    <div class="pcard wide rv">
+    <div class="pcard wide rv" data-detail="genai">
       <div>
         <div class="pmeta"><span class="pyear">2023 — 2024</span><span class="pcat g">GenAI</span></div>
         <h3 class="ptitle">TIKTOK GENAI<br>评测体系</h3>
-        <p class="pdesc">面对模型生成质量不稳定的核心痛点，从0到1搭建样本池与标签体系，制定双周迭代验证标准与 A/B 评测口径，形成可复用 benchmark 流程。推动修复价格抓取失败、商品特征幻觉等高频问题，审核通过率从 35% 提升至 94%。</p>
+        <p class="pdesc">面对模型生成质量不稳定、错误不可复现的核心痛点，从0到1搭建固定样本池、错误标签与评分维度，制定双周 A/B 回放标准，形成可复用benchmark 流程。推动修复地区价格抓取失败、商品特征幻觉等高频问题，送审通过率从 35% 提升至 94%。</p>
         <div class="pkpis">
-          <div><span class="kpi-v">35%→94%</span><span class="kpi-d">审核通过率</span></div>
+          <div><span class="kpi-v">35%→94%</span><span class="kpi-d">送审通过率</span></div>
           <div><span class="kpi-v">0→1</span><span class="kpi-d">Benchmark 体系搭建</span></div>
         </div>
+        <span class="pmore"><span class="box">+</span>展开项目深读</span>
       </div>
       <div class="pbignum"><span>94</span>%</div>
       <div class="parrow">↗</div>
     </div>
 
-    <div class="pcard rv">
+    <div class="pcard rv" data-detail="copilot">
       <div class="pmeta"><span class="pyear">2023 — 2024</span><span class="pcat g">Prompt Eng.</span></div>
       <h3 class="ptitle">COPILOT<br>采纳率优化</h3>
-      <p class="pdesc">围绕"创意生成/灵感给予"场景迭代 Prompt 与评测集，上线 thumb up 埋点辅助质量信号，采纳率从 11% 翻倍至 23%。</p>
+      <p class="pdesc">围绕创意生成/灵感给予场景，把instruction 拆成角色、目标、约束、格式与反例，每轮只改少量变量保证归因清楚，采纳率从 11% 翻倍至 23%。</p>
       <div class="pkpis">
         <div><span class="kpi-v b">11%→23%</span><span class="kpi-d">采纳率翻倍</span></div>
       </div>
+      <span class="pmore"><span class="box">+</span>展开项目深读</span>
       <div class="parrow">↗</div>
     </div>
 
-    <div class="pcard rv">
+    <div class="pcard rv" data-detail="creator">
       <div class="pmeta"><span class="pyear">2025</span><span class="pcat b">Creator Growth</span></div>
       <h3 class="ptitle">创作者分层<br>增长策略</h3>
-      <p class="pdesc">针对头中尾三层创作者差异化激励，尾部首发任务降低流失，中部教育模板化提升稳定供给，CapCut 导入高阶创作者触达约 4 万。</p>
+      <p class="pdesc">按头中尾三层创作者差异化激励：尾部首发任务降低流失，中部教育与模板引导提升稳定供给，头部以冲榜与确定性曝光维持核心供给，高阶创作者触达约 4 万。</p>
       <div class="pkpis">
         <div><span class="kpi-v b">-68%</span><span class="kpi-d">尾部流失率相对下降</span></div>
         <div><span class="kpi-v b">4万</span><span class="kpi-d">创作者触达</span></div>
       </div>
+      <span class="pmore"><span class="box">+</span>展开项目深读</span>
       <div class="parrow">↗</div>
     </div>
 
-    <div class="pcard rv">
+    <div class="pcard rv" data-detail="hotspot">
       <div class="pmeta"><span class="pyear">2025</span><span class="pcat p">Content Ops</span></div>
       <h3 class="ptitle">爆款模板<br>热点机制</h3>
-      <p class="pdesc">搭建热点信号捕捉与周度复盘机制，统一输入池+促产日历+链路指标定位，将网感机制化，以 tungtungtung 等案例为代表推动高质爆款供给。</p>
+      <p class="pdesc">把依赖网感的选题转成可复用输入机制：统一自动榜单与人工灵感，建立热点池、促产日历、创作者教育与复盘卡片，高质爆款模板等级季度环比 +32%。</p>
       <div class="pkpis">
         <div><span class="kpi-v p">+32%</span><span class="kpi-d">高等级模板季度环比</span></div>
         <div><span class="kpi-v p">+22%</span><span class="kpi-d">模板曝光月环比</span></div>
       </div>
+      <span class="pmore"><span class="box">+</span>展开项目深读</span>
       <div class="parrow">↗</div>
     </div>
 
-    <div class="pcard wide rv">
+    <div class="pcard wide rv" data-detail="farfetch">
       <div>
         <div class="pmeta"><span class="pyear">2023</span><span class="pcat r">E-Commerce</span></div>
         <h3 class="ptitle">FARFETCH<br>KOC 双生态运营</h3>
-        <p class="pdesc">设计内容类与带货类双类型 KOC 任务包与激励规则，搭建跨团队大促 SOP 交付清单。内容侧扩声量，带货侧承接转化，8次大促单次 GMV 较基线提升 700%。同步挖掘并推动落地 3 条 T0 级产品需求。</p>
+        <p class="pdesc">面对「只偏带货生态单调、只偏内容难承接 GMV」的矛盾，设计内容型与带货型双类型KOC 任务包与激励规则，用 SOP 明确节点、Owner 与验收。策划 8 次大促，单次 GMV 较活动前同周期基线提升 700%（参与推动），同步挖掘 3 条 T0 级产品需求。</p>
         <div class="pkpis">
           <div><span class="kpi-v r">+700%</span><span class="kpi-d">单次 GMV uplift</span></div>
           <div><span class="kpi-v r">8次</span><span class="kpi-d">大促全链路落地</span></div>
           <div><span class="kpi-v r">3条</span><span class="kpi-d">T0 产品需求推动</span></div>
         </div>
+        <span class="pmore"><span class="box">+</span>展开项目深读</span>
       </div>
       <div class="pbignum red"><span>+7</span>×</div>
       <div class="parrow">↗</div>
     </div>
 
-    <div class="pcard rv">
+    <div class="pcard rv" data-detail="oversea">
+      <div class="pmeta"><span class="pyear">2026</span><span class="pcat g">Decision</span></div>
+      <h3 class="ptitle">海外WECHAT<br>机会判断</h3>
+      <p class="pdesc">探索项目的有效产出，也可以是停止一项收益上限不足的重投入。测算消费盘、供给盘与发表渗透上限后，给出阶段性 no-go，并保留低成本受控试点期权。</p>
+      <div class="pkpis">
+        <div><span class="kpi-v">NO-GO</span><span class="kpi-d">阶段性不立项</span></div>
+        <div><span class="kpi-v">~5万</span><span class="kpi-d">新增发表用户理论上限</span></div>
+      </div>
+      <span class="pmore"><span class="box">+</span>展开项目深读</span>
+      <div class="parrow">↗</div>
+    </div>
+
+    <div class="pcard rv" data-detail="r2games">
       <div class="pmeta"><span class="pyear">2022</span><span class="pcat p">Community</span></div>
       <h3 class="ptitle">R2GAMES<br>社区增长</h3>
-      <p class="pdesc">策划评论区活动与内容分发，结构化收集 20+ 产品反馈推动 100% 迭代，平台活跃度（DAU）提升 219%。</p>
+      <p class="pdesc">用活动规则拉动参与，用内容资产与固定栏目承接活动后回访，结构化收集 20+ 产品反馈推动迭代，沉淀可复用 SOP。</p>
       <div class="pkpis">
-        <div><span class="kpi-v p">+219%</span><span class="kpi-d">DAU 提升</span></div>
+        <div><span class="kpi-v p">10万+</span><span class="kpi-d">推文总点击</span></div>
+        <div><span class="kpi-v p">5000+</span><span class="kpi-d">活动留言</span></div>
       </div>
+      <span class="pmore"><span class="box">+</span>展开项目深读</span>
       <div class="parrow">↗</div>
     </div>
 
@@ -571,8 +774,8 @@ footer span {
     <h2 class="sec-title">EXPERIENCE</h2>
     <div class="sec-line"></div>
   </div>
-  <div class="rv">
-    <div class="exp-item">
+  <div>
+    <div class="exp-item rv">
       <div class="exp-left">
         <span class="exp-co">腾讯<br>微信视频号</span>
         <span class="exp-period">2026.05 — 至今</span>
@@ -580,16 +783,16 @@ footer span {
       <div class="exp-mid"></div>
       <div class="exp-right">
         <span class="exp-role">Product Operations · Guangzhou</span>
-        <div class="exp-head">安全治理 × 侵权投诉闭环</div>
+        <div class="exp-head">安全治理 × 投诉后可感知治理闭环</div>
         <ul class="exp-list">
-          <li>负责名人身份仿冒等高敏投诉治理，收敛为「高可信权利人识别 - 秒级临时止损 - 处置结果透传」方案，覆盖账号与内容两类场景，影响量级约 2 万单/天</li>
-          <li>梳理处罚原因 / 动作 / 优先级与用户侧文案映射，完成透传策略与通知去重规则，两项功能已推全</li>
-          <li>累计推动 10+ 功能 / 数据 / 设计需求，定义命中量、下发率、成功率、兜底占比等上线后监控口径</li>
-          <li>探索海外视频号供给侧增长，修正海外用户识别口径，定位 HK、MY 等潜力区域，支撑业务进入决策</li>
+          <li>负责身份仿冒与肖像侵权投诉体验，把权利人投诉后的黑箱重构为「账号状态外显 - 高可信识别与可逆止损 - 结单结果透传 - 满意度验证」四段闭环，覆盖账号与内容两类场景</li>
+          <li>梳理处罚 reason / oper / 优先级与用户侧文案映射，完成本投诉结果透传与通知去重规则，账号状态外显与临时限制能力进入灰度/推全</li>
+          <li>累计推动 10+ 功能 / 数据 / 设计需求，定义命中量、覆盖率、成功率、兜底占比等上线后监控口径，并区分「交付状态」与「业务效果」</li>
+          <li>探索海外视频号供给侧增长，用消费盘、供给盘与发表渗透上限测算给出阶段性 no-go 判断</li>
         </ul>
       </div>
     </div>
-    <div class="exp-item">
+    <div class="exp-item rv">
       <div class="exp-left">
         <span class="exp-co">字节跳动<br>TikTok</span>
         <span class="exp-period">2025.03 — 2025.07</span>
@@ -599,14 +802,14 @@ footer span {
         <span class="exp-role">Product Operations · Shanghai</span>
         <div class="exp-head">爆款运营 × 创作者增长</div>
         <ul class="exp-list">
-          <li>搭建热点信号捕捉与周度复盘机制，输出促产日历，高质爆款模板等级季度环比 +32%</li>
-          <li>CapCut 导入高阶创作者触达约 4 万，沉淀私域核心创作者群 200–300 人</li>
-          <li>协助优化激励策略，尾部创作者流失率降低 68%</li>
+          <li>搭建热点信号捕捉与周度复盘机制，统一榜单与灵感输入，输出促产日历，高质爆款模板等级季度环比 +32%</li>
+          <li>高阶创作者触达约 4 万，沉淀私域核心创作者群200–300 人</li>
+          <li>按头中尾分层设计差异化激励，尾部创作者流失率相对下降 68%</li>
           <li>设计版本分层与升级激励，升级率 +38%，模板曝光量月环比 +22%</li>
         </ul>
       </div>
     </div>
-    <div class="exp-item">
+    <div class="exp-item rv">
       <div class="exp-left">
         <span class="exp-co">字节跳动<br>TikTok</span>
         <span class="exp-period">2023.11 — 2024.04</span>
@@ -616,13 +819,13 @@ footer span {
         <span class="exp-role">Product Operations · Shanghai</span>
         <div class="exp-head">GenAI 评测 × Copilot 优化</div>
         <ul class="exp-list">
-          <li>从0到1搭建 GenAI 样本池与标签体系，审核通过率 35% → 94%</li>
-          <li>迭代 Copilot Prompt 与评测集，采纳率从 11% 翻倍至 23%</li>
-          <li>制定双周迭代验证标准与 A/B 评测口径，形成可复用 benchmark 流程</li>
+          <li>从0到1搭建 GenAI 送审样本池与错误标签体系，送审通过率 35% → 94%</li>
+          <li>迭代 Copilot instruction 与评测集，采纳率从 11% 翻倍至 23%</li>
+          <li>制定双周迭代验证标准与 A/B 回放口径，形成可复用 benchmark 四件套</li>
         </ul>
       </div>
     </div>
-    <div class="exp-item">
+    <div class="exp-item rv">
       <div class="exp-left">
         <span class="exp-co">Farfetch<br>发发奇</span>
         <span class="exp-period">2023.08 — 2023.11</span>
@@ -632,13 +835,13 @@ footer span {
         <span class="exp-role">Product Operations · Shanghai</span>
         <div class="exp-head">KOC 全链路运营</div>
         <ul class="exp-list">
-          <li>策划 8 次大促，单次 GMV 较活动前基线提升 700%</li>
+          <li>设计内容型与带货型双类型 KOC 任务包，策划 8 次大促，单次 GMV 较活动前同周期基线提升 700%</li>
           <li>撰写 80+ 激励文章，监测与优化 KOC 激励规则</li>
           <li>从0到1制定并迭代小红书运营 SOP，挖掘 3 条 T0 级产品需求推动落地</li>
         </ul>
       </div>
     </div>
-    <div class="exp-item">
+    <div class="exp-item rv">
       <div class="exp-left">
         <span class="exp-co">芒果 TV</span>
         <span class="exp-period">2023.05 — 2023.08</span>
@@ -648,12 +851,12 @@ footer span {
         <span class="exp-role">Marketing · Changsha</span>
         <div class="exp-head">综艺项目营销支持</div>
         <ul class="exp-list">
-          <li>从0到1输出营销手册及招商 PPT 初版</li>
+          <li>从0到1输出营销手册及招商PPT 初版</li>
           <li>结合数据与深访输出 2000+ 字用户画像与竞品分析报告</li>
         </ul>
       </div>
     </div>
-    <div class="exp-item">
+    <div class="exp-item rv">
       <div class="exp-left">
         <span class="exp-co">R2Games</span>
         <span class="exp-period">2022.06 — 2022.09</span>
@@ -663,7 +866,7 @@ footer span {
         <span class="exp-role">Product Operations · Shenzhen</span>
         <div class="exp-head">社区内容运营</div>
         <ul class="exp-list">
-          <li>策划评论区活动，平台活跃度（DAU）提升 219%</li>
+          <li>策划评论区活动，用内容资产与固定栏目承接活动后回访</li>
           <li>撰写 10+ 游戏推文脚本，总点击 10 万+，互动率 ≥ 0.5%</li>
           <li>结构化收集 20+ 产品反馈并推动 100% 问题迭代</li>
         </ul>
@@ -679,16 +882,16 @@ footer span {
     <h2 class="sec-title">SKILLS</h2>
     <div class="sec-line"></div>
   </div>
-  <div class="sgrid rv">
-    <div class="sblock">
+  <div class="sgrid">
+    <div class="sblock rv">
       <span class="sicon">⚡</span>
       <div class="sname">数据分析</div>
       <div class="stags">
         <span class="stag">A/B Test</span><span class="stag">漏斗分析</span>
-        <span class="stag">指标拆解</span><span class="stag">Jamovi</span><span class="stag">Excel</span>
+        <span class="stag">指标拆解</span><span class="stag">口径校准</span><span class="stag">Excel</span>
       </div>
     </div>
-    <div class="sblock">
+    <div class="sblock rv">
       <span class="sicon">🤖</span>
       <div class="sname">GenAI 产品</div>
       <div class="stags">
@@ -696,7 +899,7 @@ footer span {
         <span class="stag">质量评测体系</span><span class="stag">幻觉问题定位</span>
       </div>
     </div>
-    <div class="sblock">
+    <div class="sblock rv">
       <span class="sicon">📈</span>
       <div class="sname">增长运营</div>
       <div class="stags">
@@ -704,32 +907,32 @@ footer span {
         <span class="stag">供给侧策略</span><span class="stag">GMV 增长</span>
       </div>
     </div>
-    <div class="sblock">
+    <div class="sblock rv">
       <span class="sicon">🎯</span>
       <div class="sname">内容运营</div>
       <div class="stags">
-        <span class="stag">热点捕捉</span><span class="stag">爆款机制化</span>
+        <span class="stag">热点机制化</span><span class="stag">爆款供给</span>
         <span class="stag">小红书运营</span><span class="stag">KOC/KOL 生态</span>
       </div>
     </div>
-    <div class="sblock">
+    <div class="sblock rv">
       <span class="sicon">🛡️</span>
       <div class="sname">安全治理</div>
       <div class="stags">
-        <span class="stag">侵权投诉闭环</span><span class="stag">权利人识别</span>
-        <span class="stag">处罚规则建模</span><span class="stag">上线监控口径</span>
+        <span class="stag">投诉闭环设计</span><span class="stag">高可信识别</span>
+        <span class="stag">状态机/对象建模</span><span class="stag">处罚归因映射</span><span class="stag">监控口径</span>
       </div>
     </div>
-    <div class="sblock">
+    <div class="sblock rv">
       <span class="sicon">🔧</span>
       <div class="sname">产品支持</div>
       <div class="stags">
-        <span class="stag">需求挖掘</span><span class="stag">SOP 搭建</span>
+        <span class="stag">需求定义</span><span class="stag">SOP 搭建</span>
         <span class="stag">跨团队协同</span><span class="stag">Axure · Figma</span>
         <span class="stag">Codex</span><span class="stag">Xmind · Blender</span>
       </div>
     </div>
-    <div class="sblock">
+    <div class="sblock rv">
       <span class="sicon">🌍</span>
       <div class="sname">语言 / 学历</div>
       <div class="stags">
@@ -748,15 +951,15 @@ footer span {
     <h2 class="sec-title">ABOUT</h2>
     <div class="sec-line"></div>
   </div>
-  <div class="about-grid rv">
-    <div class="aphoto-wrap">
+  <div class="about-grid">
+    <div class="aphoto-wrap rv">
       <img src="photo.jpeg" alt="严哲堃" class="aphoto">
       <div class="aphoto-badge">Product Operations<br>2022 — Present</div>
     </div>
-    <div class="atext">
-      <h2>从网感<br>到系统</h2>
-      <p>我是严哲堃，一名横跨安全治理、GenAI、电商与内容生态的产品运营。拥有微信视频号、TikTok、Farfetch、芒果TV 等头部平台的完整实战经验，擅长把分散的网感变成可复用的机制，把业务目标拆解为可落地的数据闭环。</p>
-      <p>我相信最好的运营是「既懂用户，又看数据」——用 A/B Test 验证直觉，用漏斗分析找到掉点，用 SOP 让成功可以复制。目前在微信视频号负责名人侵权投诉治理与海外机会探索，同时于瑞典乌普萨拉大学攻读数字媒体硕士，持续关注 AI 时代的人机协作与内容生产变革。</p>
+    <div class="atext rv">
+      <h2>把模糊问题<br>变成机制</h2>
+      <p>我是严哲堃，一名横跨安全治理、GenAI、电商与内容生态的产品运营。我稳定复用的能力，是<span class="ac">识别关键矛盾、建立可执行机制，并用数据决定扩大、调整或停止</span>。拥有微信视频号、TikTok、Farfetch、芒果TV 等头部平台的完整实战经验。</p>
+      <p>我相信最好的运营是「既懂用户，又看数据」——用A/B Test 验证直觉，用漏斗分析找到掉点，用 SOP 让成功可以复制，同时始终为每个数字标清分母、时间窗与能支持到哪一层。目前在微信视频号负责投诉后可感知治理闭环与海外机会判断，并于瑞典乌普萨拉大学攻读数字媒体硕士。</p>
       <p class="ac">小红书职场类内容 3月、6月全网第一 · 私域用户 500+ · 小宇宙深度对谈主理人</p>
       <div class="alist">
         <div class="arow"><span class="arow-n">①</span>乌普萨拉大学 数字媒体硕士（全额奖学金，2024 — 2026.12）</div>
@@ -786,55 +989,455 @@ footer span {
   <span>Product Operations · Trust &amp; Safety · GenAI · Content Ecosystem</span>
 </footer>
 
+<!-- ============ 半开屏抽屉式 详情弹窗 ============ -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
+  <div class="drawer-grip" id="drawerGrip"><span></span></div>
+  <div class="drawer-top">
+    <div>
+      <div class="drawer-eyebrow" id="drawerEyebrow"></div>
+      <div class="drawer-title" id="drawerTitle"></div>
+    </div>
+    <button class="drawer-close" id="drawerClose" aria-label="关闭">✕</button>
+  </div>
+  <div class="drawer-scroll" id="drawerScroll"></div>
+</div>
+
+<!-- GSAP -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script>
-// Custom cursor — only on real pointer devices
+/* ============================================================
+   项目深读内容（对外安全口径：只用比例、区间、方法与公开可解释逻辑，
+   不含内部 reason/oper 字段名、具体阈值与内部单量）
+   ============================================================ */
+const DETAILS = {
+  tencent: {
+    cat: 'Trust & Safety', catClass: 'b', year: '2026 — 至今',
+    title: '微信视频号 · 投诉后可感知治理闭环',
+    lede: '把权利人投诉后的<span class="ac">「等待与模糊反馈」</span>，重构为可感知、可止损、可解释、可验证的治理闭环。核心不是某一个功能，而是一条完整的用户旅程。',
+    blocks: [
+      { type:'flow', h:'四段闭环 · 按用户时刻组织', steps:[
+        { t:'账号状态外显', d:'提交投诉时先回答「平台此前是否已行动」，外显当前有效验证或处罚态，降低"平台完全没作为"的感知。' },
+        { t:'高可信 + 可逆止损', d:'用证件人脸、个人认证、历史通过三层信号识别高可信权利人，命中后在终审前先做可逆临时限制，缩短风险暴露窗口。' },
+        { t:'结单结果透传', d:'只读取本投诉关联的处罚流水，按实际动作归并成用户能理解的结果，不把账号其他处罚错误归因给本次投诉。' },
+        { t:'满意度与验证', d:'把满意度、前端行为埋点与后台时间线放进同一条证据链，持续定位问题并回到产品动作。' },
+      ]},
+      { type:'cols', h:'黑箱如何形成 · 两类断层', points:[
+        { t:'时间断层', tick:'01', d:'人工/法务终审需要时间，侵权内容在等待期间仍可能继续传播，权利人承担新增曝光与情绪成本。' },
+        { t:'信息断层', tick:'02', d:'后台已有验证、限制、删除等动作，用户前台却只能看到模糊的"已处理"，处理力度与预期持续错位。' },
+      ]},
+      { type:'cols', h:'关键产品判断', points:[
+        { t:'从完整透明收敛到关键时刻', tick:'▹', d:'初期想展示完整投诉流程并定期通报，因抗辩/授权/撤诉分支复杂、离当下痛点远，最终聚焦"发起-等待-结单"三个高价值时刻再补反馈闭环。' },
+        { t:'可逆优先、本人优先、主盘优先', tick:'▹', d:'只在高可信证据成立时先行限制且可回滚；权利人本人首期、代理人二期；旧版主盘先补齐止损与透传，不等长期迁移。' },
+        { t:'四个对象不能混用', tick:'▹', d:'权利主体/ 投诉对象 / 处置对象 / 通知对象各自独立，避免"多个内容被当成多次通知""处罚范围扩大或解除错对象"。' },
+        { t:'交付 ≠ 效果', tick:'▹', d:'推全、灰度、Ready 只是交付状态；风险暴露时长缩短、命中后终审通过、满意度改善才是业务结果，需灰度后验。' },
+      ]},
+      { type:'metrics', h:'证据与边界（对外可解释口径）', items:[
+        { v:'52,610/ 14天', d:'身份仿冒与曝光肖像入口 · 日均约 3,758单', cls:'b' },
+        { v:'四层', d:'准确性拆解：输入有效 / 匹配对象 / 模型匹配 / 动作风险', cls:'b' },
+        { v:'3,553条', d:'满意度反馈已回收· 作为基线与问题结构', cls:'b' },
+        { v:'10+', d:'推动功能 / 数据 / 设计需求落地', cls:'b' },
+      ]},
+      { type:'note', nt:'口径红线 / 护栏', d:'覆盖率不等于准确率——策略命中只说明进入先行止损范围，命中且终审通过、驳回即时解除、误伤 Case 才共同接近策略质量。不同链路与时间窗的数据不直接拼成漏斗；具体阈值、内部字段与单量仅用于个人准备，不对外展开。' },
+    ],
+    tags:['问题定义','状态机/对象建模','处罚归因映射','通知去重','灰度与监控','法务边界']
+  },
+
+  genai: {
+    cat: 'GenAI', catClass: 'g', year: '2023 — 2024',
+    title: 'TikTok GenAI 送审质量评测体系',
+    lede: '先建立<span class="ac">可复现的评测语言</span>，再讨论模型与提示词优化——把"质量不稳定、错误不可复现、研发无法定位"变成一套可迭代的 benchmark。',
+    blocks: [
+      { type:'cols', h:'问题 → 机制', points:[
+        { t:'核心痛点', tick:'01', d:'送审质量波动，同一错误难以复现，研发无法定位问题来源，送审通过率初始约 35%。' },
+        { t:'解法机制', tick:'02', d:'固定任务集+ 错误标签 + 评分维度 + 双周 A/B 回放，把主观"感觉不行"变成可归因的结构化信号。' },
+      ]},
+      { type:'flow', h:'可复用Benchmark 四件套', steps:[
+        { t:'固定任务集', d:'覆盖真实高频与边界场景，保证每轮评测面对同一批考题。' },
+        { t:'固定评分维度', d:'准确性、可验证性、可执行性、一致性四个维度分别打分。' },
+        { t:'单变量迭代', d:'每轮只改 1–2 个关键变量，保持归因清楚，避免多因素混淆。' },
+        { t:'同批回放', d:'同一批样本回放，并结合线上主指标与错误类型分布判断。' },
+      ]},
+      { type:'metrics', h:'结果', items:[
+        { v:'35% → 94%', d:'送审通过率', cls:'g' },
+        { v:'0 → 1', d:'评测体系从无到有', cls:'g' },
+        { v:'双周', d:'A/B 回放迭代节奏', cls:'g' },
+      ]},
+      { type:'note', nt:'典型错误 → 可复现bug 单', d:'把"地区价格抓取失败""商品特征幻觉"等高频问题沉淀为可复现的 bug 单与供给输入标准。这套评测方法与腾讯项目的"策略空跑、阈值 Review、终审回放、固定样本"本质上是同一种方法论。' },
+    ],
+    tags:['固定样本池','错误标签体系','评分维度','单变量归因','A/B 回放']
+  },
+
+  copilot: {
+    cat: 'Prompt Engineering', catClass: 'g', year: '2023 — 2024',
+    title: 'Copilot 采纳率优化',
+    lede: '输出不稳定时，先解决<span class="ac">"如何判断一次改动是否有效"</span>，再谈优化本身。',
+    blocks: [
+      { type:'cols', h:'问题 → 机制', points:[
+        { t:'核心痛点', tick:'01', d:'创意生成/灵感场景输出不稳定，难以判断 instruction 改动是否真正有效，初始采纳率约 11%。' },
+        { t:'解法机制', tick:'02', d:'把 instruction 拆成角色、目标、约束、格式与反例五要素，每轮只改少量变量，保证效果可归因。' },
+      ]},
+      { type:'metrics', h:'结果与指标口径', items:[
+        { v:'11% → 23%', d:'采纳率翻倍', cls:'g' },
+        { v:'采纳率', d:'主指标 · thumb up 仅作辅助', cls:'g' },
+      ]},
+      { type:'note', nt:'指标选择', d:'以真实"采纳"为主指标，thumb up 作为辅助信号——避免用"喜欢"代替"真实使用"，防止指标虚高。' },
+    ],
+    tags:['Instruction 拆解','单变量实验','采纳率','评测集']
+  },
+
+  creator: {
+    cat: 'Creator Growth', catClass: 'b', year: '2025',
+    title: '创作者分层增长策略',
+    lede: '把泛化的激励，换成<span class="ac">按分层解决不同问题</span>的机制——不同层级创作者的核心矛盾并不相同。',
+    blocks: [
+      { type:'flow', h:'头中尾三层 · 差异化动作', steps:[
+        { t:'尾部', d:'问题：首发无反馈、二次投稿掉点高。动作：首发与二发任务、低门槛反馈。目标：7天复投稿、流失率。' },
+        { t:'中部', d:'问题：质量波动、缺稳定方法。动作：教育、模板引导与质量门槛。目标：稳定投稿、高质率。' },
+        { t:'头部', d:'问题：现金激励边际弱。动作：冲榜、荣誉与确定性曝光。目标：核心供给稳定。' },
+        { t:'漏斗', d:'统一用「曝光 → CTR → Start rate → Submit rate」漏斗定位每层掉点。' },
+      ]},
+      { type:'metrics', h:'结果', items:[
+        { v:'-68%', d:'尾部创作者流失率相对下降', cls:'b' },
+        { v:'~4 万', d:'高阶创作者触达', cls:'b' },
+        { v:'+38%', d:'版本升级率', cls:'b' },
+        { v:'+22%', d:'模板曝光量月环比', cls:'b' },
+      ]},
+      { type:'note', nt:'表达边界', d:'尾部流失率 -68% 为相对下降，面试/对外表达时需补齐优化前后绝对值与 cohort 时间窗。核心能力是把经验判断转成输入标准、状态与漏斗，并用后验复盘决定下一轮动作。' },
+    ],
+    tags:['创作者分层','激励设计','漏斗分析','cohort 复盘']
+  },
+
+  hotspot: {
+    cat: 'Content Ops', catClass: 'p', year: '2025',
+    title: '爆款模板 · 热点机制化',
+    lede: '把依赖<span class="ac">个人网感</span>的选题，转成可复用、可复盘的<span class="ac">输入机制</span>。',
+    blocks: [
+      { type:'cols', h:'判断 → 动作', points:[
+        { t:'关键判断', tick:'01', d:'追求热点覆盖量会增加噪音；减少主推数量、提高"可模板化命中"更重要。' },
+        { t:'机制动作', tick:'02', d:'统一自动榜单与人工灵感输入，建立热点池、促产日历、创作者教育与复盘卡片。' },
+      ]},
+      { type:'metrics', h:'结果', items:[
+        { v:'+32%', d:'高质爆款模板等级 季度环比', cls:'p' },
+        { v:'+22%', d:'模板曝光 月环比', cls:'p' },
+        { v:'个位数%', d:'Submit rate 保守改善（谨慎口径）', cls:'p' },
+      ]},
+      { type:'note', nt:'口径说明', d:'Submit rate 只保守表达为个位数百分点改善。核心价值在于把"网感"沉淀为团队可复用的输入池与复盘卡片，降低对个人经验的依赖。' },
+    ],
+    tags:['热点池','促产日历','创作者教育','复盘卡片']
+  },
+
+  farfetch: {
+    cat: 'E-Commerce', catClass: 'r', year: '2023',
+    title: 'Farfetch · KOC 双生态运营',
+    lede: '用<span class="ac">双类型供给</span>解决"内容与转化难兼顾"的矛盾：内容型 KOC 扩声量，带货型 KOC 承接GMV。',
+    blocks: [
+      { type:'cols', h:'矛盾 → 机制', points:[
+        { t:'关键矛盾', tick:'01', d:'只偏带货会让生态单调；只偏内容又难稳定承接 GMV。' },
+        { t:'双生态机制', tick:'02', d:'内容型 KOC 负责声量与内容形态，带货型 KOC 负责下单承接，分别设计任务包、激励与素材规范。' },
+        { t:'SOP 交付', tick:'03', d:'用 SOP 明确大促各节点、Owner 与验收标准，让8 次大促可复制交付。' },
+        { t:'反哺产品', tick:'04', d:'从一线运营中挖掘并推动落地 3 条T0 级产品需求。' },
+      ]},
+      { type:'metrics', h:'结果', items:[
+        { v:'+700%', d:'单次大促 GMV 相对活动前同周期基线', cls:'r' },
+        { v:'8 次', d:'大促全链路落地', cls:'r' },
+        { v:'80+', d:'激励文章撰写', cls:'r' },
+        { v:'3 条', d:'T0 级产品需求推动', cls:'r' },
+      ]},
+      { type:'note', nt:'表达边界', d:'GMV +700% 需主动说明基线，并保留大促自然流量、资源位与折扣力度等共同影响，对外统一表述为"参与推动"，避免把共同作用直接归因于单一动作。' },
+    ],
+    tags:['KOC 双生态','任务包设计','大促 SOP','需求挖掘']
+  },
+
+  oversea: {
+    cat: 'Decision Quality', catClass: 'g', year: '2026',
+    title: '海外 WeChat · 机会判断（No-Go）',
+    lede: '探索项目的有效产出，可以是<span class="ac">停止一项收益上限不足的重投入</span>——用测算而非直觉做出阶段性no-go。',
+    blocks: [
+      { type:'flow', h:'判断路径', steps:[
+        { t:'C 端消费', d:'海外用户人均停留与曝光不低，但整体盘有限——问题从"用户看不看"转向"供给能带来多少新增"。' },
+        { t:'作者供给', d:'高表现集中于明星或头部 IP，中低粉作者偏弱，优秀 Case 不能证明可复制。' },
+        { t:'发表渗透', d:'海外约 0.5%，国内约 1%。即使翻倍，新增发表用户理论上限约 5 万。' },
+        { t:'投入成本', d:'需补齐实名、准入、审核、分发、治理、法务与运营，成本明显高于一个入口改动。' },
+      ]},
+      { type:'metrics', h:'结论', items:[
+        { v:'NO-GO', d:'现阶段阶段性不立项', cls:'g' },
+        { v:'~5 万', d:'新增发表用户理论上限', cls:'g' },
+        { v:'30–50 人', d:'低成本受控试点规模', cls:'g' },
+      ]},
+      { type:'note', nt:'保留期权', d:'不是简单否决：保留一个 4–6 周、30–50 名高可信作者的受控试点，仅开放基础发表；若多个中低粉作者在同类内容上稳定获得高于同层级基线的消费与互动、且治理成本可控，再重启评估。' },
+    ],
+    tags:['机会测算','增量上限','能力成本','受控试点']
+  },
+
+  r2games: {
+    cat: 'Community', catClass: 'p', year: '2022',
+    title: 'R2Games · 社区增长',
+    lede: '用活动规则拉动参与，用<span class="ac">内容资产与固定栏目</span>承接活动后的回访，把短期活动沉淀为可复用资产。',
+    blocks: [
+      { type:'cols', h:'机制 → 动作', points:[
+        { t:'参与机制', tick:'01', d:'用活动规则设计拉动评论区参与，用内容资产与固定栏目承接活动后回访。' },
+        { t:'反馈闭环', tick:'02', d:'结构化收集 20+ 产品反馈并推动迭代，沉淀可复用 SOP。' },
+      ]},
+      { type:'metrics', h:'结果（可回溯口径）', items:[
+        { v:'10万+', d:'推文总点击', cls:'p' },
+        { v:'5000+', d:'活动留言', cls:'p' },
+        { v:'≥0.5%', d:'推文互动率', cls:'p' },
+        { v:'20+', d:'结构化产品反馈', cls:'p' },
+      ]},
+      { type:'note', nt:'口径说明', d:'旧材料另有 DAU +219%，但若保留需补活动前基线、活动窗口与活动后留存；对外优先使用可回溯的点击与留言数据。' },
+    ],
+    tags:['活动设计','内容承接','反馈结构化','SOP 沉淀']
+  }
+};
+
+/* ============================================================
+   动效：GSAP +ScrollTrigger（含prefers-reduced-motion 适配）
+   ============================================================ */
+gsap.registerPlugin(ScrollTrigger);
+
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- 自定义光标（仅精确指针设备） ---------- */
 if (window.matchMedia('(pointer: fine)').matches) {
   const dot = document.getElementById('curDot');
   const ring = document.getElementById('curRing');
   dot.style.display = 'block';
   ring.style.display = 'block';
-
   let mx = 0, my = 0, rx = 0, ry = 0;
-
   document.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
-    dot.style.left = mx + 'px';
-    dot.style.top  = my + 'px';
+    dot.style.left = mx + 'px'; dot.style.top = my + 'px';
   });
-
-  (function animRing() {
-    rx += (mx - rx) * 0.13;
-    ry += (my - ry) * 0.13;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
-    requestAnimationFrame(animRing);
-  })();
-
-  document.querySelectorAll('a, button, .pcard, .stat, .sblock').forEach(el => {
+  gsap.ticker.add(() => {
+    rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  });
+  const hoverSel = 'a, button, .pcard, .stat, .sblock, .drawer-close, .cbtn';
+  document.querySelectorAll(hoverSel).forEach(el => {
     el.addEventListener('mouseenter', () => {
-      dot.style.width = '6px'; dot.style.height = '6px';
-      ring.style.width = '54px'; ring.style.height = '54px';
-      ring.style.opacity = '0.7';
+      dot.style.width='6px'; dot.style.height='6px';
+      ring.style.width='54px'; ring.style.height='54px'; ring.style.opacity='0.7';
     });
     el.addEventListener('mouseleave', () => {
-      dot.style.width = '10px'; dot.style.height = '10px';
-      ring.style.width = '36px'; ring.style.height = '36px';
-      ring.style.opacity = '0.45';
+      dot.style.width='10px'; dot.style.height='10px';
+      ring.style.width='36px'; ring.style.height='36px'; ring.style.opacity='0.45';
     });
   });
 }
 
-// Scroll reveal
-const els = document.querySelectorAll('.rv');
-const obs = new IntersectionObserver(entries => {
-  entries.forEach((e, i) => {
-    if (e.isIntersecting) {
-      setTimeout(() => e.target.classList.add('in'), i * 60);
-      obs.unobserve(e.target);
+if (prefersReduced) {
+  /* 无障碍：直接显示所有内容，不做动画 */
+  document.body.classList.add('no-anim');
+  document.querySelectorAll('.rv').forEach(el => el.classList.add('in'));
+  document.querySelectorAll('.count').forEach(el => {
+    el.textContent = el.dataset.to + (el.dataset.suffix || '');
+  });
+} else {
+  /* ---------- HERO 入场：字符逐个上浮 ---------- */
+  const heroName = document.getElementById('heroName');
+  // 把非标签文本拆成 <span class="char">，保留 <br> 与 .ac
+  (function splitChars(node){
+    const kids = Array.from(node.childNodes);
+    kids.forEach(k => {
+      if (k.nodeType === 3) { // text node
+        const frag = document.createDocumentFragment();
+        k.textContent.split('').forEach(ch => {
+          if (ch.trim() === '') { frag.appendChild(document.createTextNode(ch)); return; }
+          const s = document.createElement('span');
+          s.className = 'char'; s.textContent = ch;
+          frag.appendChild(s);
+        });
+        node.replaceChild(frag, k);
+      } else if (k.nodeType === 1 && k.tagName !== 'BR') {
+        // .ac span → 包一层 char 保持颜色
+        k.classList.add('char');
+      }
+    });
+  })(heroName);
+
+  const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+  heroTl
+    .from('.hero-eyebrow', { y: 20, autoAlpha: 0, duration: 0.7 })
+    .from('.hero-name .char', { yPercent: 120, autoAlpha: 0, duration: 0.9, stagger: 0.045, ease: 'power4.out' }, '-=0.35')
+    .from('.hero-desc', { y: 24, autoAlpha: 0, duration: 0.8 }, '-=0.5')
+    .from('.hero-tags .htag', { y: 16, autoAlpha: 0, duration: 0.5, stagger: 0.06 }, '-=0.5')
+    .from('.scroll-hint', { autoAlpha: 0, duration: 0.8 }, '-=0.2');
+
+  /* Hero 背景大字 & 照片 视差 */
+  gsap.to('.hero-bg-word', {
+    xPercent: -8, ease: 'none',
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 }
+  });
+  gsap.to('.hero-photo', {
+    yPercent: 12, ease: 'none',
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 }
+  });
+
+  /* ---------- Ticker：GSAP 无缝循环 ---------- */
+  const track = document.getElementById('tickerTrack');
+  track.innerHTML = track.innerHTML + track.innerHTML; // duplicate for seamless loop
+  gsap.to(track, {
+    xPercent: -50, ease: 'none', duration: 26, repeat: -1
+  });
+
+  /* ---------- 通用滚动淡入 .rv ---------- */
+  gsap.utils.toArray('.rv').forEach(el => {
+    gsap.fromTo(el, { y: 40, autoAlpha: 0 }, {
+      y: 0, autoAlpha: 1, duration: 0.8, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* ---------- Section 标题分隔线拉伸 ---------- */
+  gsap.utils.toArray('.sec-line').forEach(line => {
+    gsap.fromTo(line, { scaleX: 0 }, {
+      scaleX: 1, duration: 1.1, ease: 'power3.inOut',
+      scrollTrigger: { trigger: line, start: 'top 90%' }
+    });
+  });
+
+  /* ---------- 数字滚动计数 ---------- */
+  gsap.utils.toArray('.count').forEach(el => {
+    const to = parseFloat(el.dataset.to);
+    const suffix = el.dataset.suffix || '';
+    const obj = { v: 0 };
+    ScrollTrigger.create({
+      trigger: el, start: 'top 90%', once: true,
+      onEnter: () => {
+        gsap.to(obj, {
+          v: to, duration: 1.6, ease: 'power2.out',
+          onUpdate: () => {
+            el.textContent = (to >= 1000 ? Math.round(obj.v).toLocaleString() : Math.round(obj.v)) + suffix;
+          }
+        });
+      }
+    });
+  });
+
+  /* ---------- 项目卡片：进场+ 轻微悬停视差 ---------- */
+  gsap.utils.toArray('.pcard').forEach(card => {
+    const big = card.querySelector('.pbignum');
+    if (big) {
+      gsap.to(big, {
+        yPercent: -14, ease: 'none',
+        scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: 1 }
+      });
     }
   });
-}, { threshold: 0.08 });
-els.forEach(el => obs.observe(el));
+}
+
+/* ============================================================
+   半开屏抽屉式详情弹窗
+   ============================================================ */
+const overlay = document.getElementById('drawerOverlay');
+const drawer  = document.getElementById('drawer');
+const dScroll = document.getElementById('drawerScroll');
+const dTitle  = document.getElementById('drawerTitle');
+const dEye    = document.getElementById('drawerEyebrow');
+let lastFocused = null;
+
+function esc(s){ return s; } // 内容为受控常量，无需转义
+
+function buildBlock(b){
+  if (b.type === 'flow') {
+    const steps = b.steps.map((s,i) =>
+      `<div class="d-step"><span class="num">0${i+1}</span><div class="st-t">${s.t}</div><div class="st-d">${s.d}</div></div>`
+    ).join('');
+    return `<div class="d-block d-anim"><div class="d-h">${b.h}</div><div class="d-flow">${steps}</div></div>`;
+  }
+  if (b.type === 'cols') {
+    const pts = b.points.map(p =>
+      `<div class="d-point"><div class="pt-t"><span class="tick">${p.tick||'▹'}</span>${p.t}</div><div class="pt-d">${p.d}</div></div>`
+    ).join('');
+    return `<div class="d-block d-anim"><div class="d-h">${b.h}</div><div class="d-cols">${pts}</div></div>`;
+  }
+  if (b.type === 'metrics') {
+    const ms = b.items.map(m =>
+      `<div class="d-metric ${m.cls||''}"><div class="m-v">${m.v}</div><div class="m-d">${m.d}</div></div>`
+    ).join('');
+    return `<div class="d-block d-anim"><div class="d-h">${b.h}</div><div class="d-metrics">${ms}</div></div>`;
+  }
+  if (b.type === 'note') {
+    return `<div class="d-block d-anim"><div class="d-note"><span class="nt">${b.nt}</span>${b.d}</div></div>`;
+  }
+  if (b.type === 'ul') {
+    const lis = b.items.map(x => `<li>${x}</li>`).join('');
+    return `<div class="d-block d-anim"><div class="d-h">${b.h}</div><ul class="d-ul">${lis}</ul></div>`;
+  }
+  return '';
+}
+
+function openDrawer(key){
+  const d = DETAILS[key];
+  if (!d) return;
+  lastFocused = document.activeElement;
+
+  dEye.innerHTML = `<span class="dcat pcat ${d.catClass}" style="color:${
+    d.catClass==='b'?'var(--blue)':d.catClass==='r'?'var(--acid2)':d.catClass==='p'?'var(--pink)':'var(--acid)'
+  }">${d.cat}</span><span>${d.year}</span>`;
+  dTitle.textContent = d.title;
+
+  const tagRow = d.tags ? `<div class="d-block d-anim"><div class="d-h">能力标签</div><div class="d-tagrow">${
+    d.tags.map(t=>`<span class="d-tag">${t}</span>`).join('')
+  }</div></div>` : '';
+
+  dScroll.innerHTML =
+    `<div class="d-lede d-anim">${d.lede}</div>` +
+    d.blocks.map(buildBlock).join('') +
+    tagRow;
+  dScroll.scrollTop = 0;
+
+  document.body.classList.add('locked');
+  overlay.classList.add('open');
+  drawer.setAttribute('aria-hidden','false');
+
+  if (prefersReduced) {
+    gsap.set(overlay, { autoAlpha: 1 });
+    gsap.set(drawer, { y: 0 });
+    gsap.set('.d-anim', { autoAlpha: 1, y: 0 });
+  } else {
+    gsap.to(overlay, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' });
+    gsap.fromTo(drawer, { y: '100%' }, { y: '0%', duration: 0.6, ease: 'power4.out' });
+    gsap.fromTo('.d-anim',
+      { y: 26, autoAlpha: 0 },
+      { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.08, ease: 'power2.out', delay: 0.2 }
+    );
+  }
+  document.getElementById('drawerClose').focus();
+}
+
+function closeDrawer(){
+  if (drawer.getAttribute('aria-hidden') === 'true') return;
+  const done = () => {
+    overlay.classList.remove('open');
+    drawer.setAttribute('aria-hidden','true');
+    document.body.classList.remove('locked');
+    if (lastFocused) lastFocused.focus();
+  };
+  if (prefersReduced) {
+    gsap.set(overlay, { autoAlpha: 0 });
+    gsap.set(drawer, { y: '100%' });
+    done();
+  } else {
+    gsap.to(overlay, { autoAlpha: 0, duration: 0.35, ease: 'power2.in' });
+    gsap.to(drawer, { y: '100%', duration: 0.5, ease: 'power3.in', onComplete: done });
+  }
+}
+
+document.querySelectorAll('.pcard[data-detail]').forEach(card => {
+  card.addEventListener('click', () => openDrawer(card.dataset.detail));
+  card.setAttribute('tabindex','0');
+  card.setAttribute('role','button');
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrawer(card.dataset.detail); }
+  });
+});
+document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+document.getElementById('drawerGrip').addEventListener('click', closeDrawer);
+overlay.addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 </script>
 </body>
 </html>
