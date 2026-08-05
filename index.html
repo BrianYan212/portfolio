@@ -76,6 +76,21 @@ nav {
   transition: opacity 0.2s;
 }
 .nav-links a:hover { opacity: 1; }
+.nav-right { display: flex; align-items: center; gap: 2.2rem; }
+
+/* LANG TOGGLE */
+.lang-toggle {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.68rem; letter-spacing: 0.1em;
+  background: transparent; border: 1px solid rgba(200,255,0,0.4);
+  color: var(--white); padding: 0.4rem 0.7rem;
+  display: flex; align-items: center; gap: 0.4rem;
+  transition: border-color 0.2s;
+}
+.lang-toggle:hover { border-color: var(--acid); }
+.lang-toggle .lang-opt { opacity: 0.4; transition: opacity 0.2s, color 0.2s; }
+.lang-toggle .lang-opt.active { opacity: 1; color: var(--acid); }
+.lang-toggle .lang-sep { opacity: 0.3; }
 
 /* HERO */
 .hero {
@@ -605,12 +620,19 @@ footer span {
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">YAN.BRIANKUN</a>
-  <ul class="nav-links">
-    <li><a href="#work">作品</a></li>
-    <li><a href="#exp">经历</a></li>
-    <li><a href="#about">关于</a></li>
-    <li><a href="#contact">联系</a></li>
-  </ul>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="#work" data-i18n="nav_work">作品</a></li>
+      <li><a href="#exp" data-i18n="nav_exp">经历</a></li>
+      <li><a href="#about" data-i18n="nav_about">关于</a></li>
+      <li><a href="#contact" data-i18n="nav_contact">联系</a></li>
+    </ul>
+    <button class="lang-toggle" id="langToggle" aria-label="Switch language" type="button">
+      <span class="lang-opt" data-lang="zh">中</span>
+      <span class="lang-sep">/</span>
+      <span class="lang-opt" data-lang="en">EN</span>
+    </button>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -618,17 +640,17 @@ footer span {
   <div class="hero-bg-word">PRODUCT OPERATIONS</div>
   <img src="photo.jpeg" alt="严哲堃" class="hero-photo">
   <div class="hero-body">
-    <div class="hero-eyebrow">Product Operations · Trust &amp; Safety · GenAI · Content Ecosystem</div>
+    <div class="hero-eyebrow" data-i18n="hero_eyebrow">Product Operations · Trust &amp; Safety · GenAI · Content Ecosystem</div>
     <h1 class="hero-name" id="heroName">严<span class="ac">哲</span>堃<br>BRIAN</h1>
-    <p class="hero-desc">用数据说话，用网感驱动增长。微信视频号 · TikTok · Farfetch · 芒果TV 全链路实战经历，横跨安全治理、GenAI 评测、创作者生态与电商增长。</p>
+    <p class="hero-desc" data-i18n="hero_desc">用数据说话，用网感驱动增长。微信视频号 · TikTok · Farfetch · 芒果TV 全链路实战经历，横跨安全治理、GenAI 评测、创作者生态与电商增长。</p>
     <div class="hero-tags">
-      <span class="htag">安全治理</span>
-      <span class="htag">GenAI 评测体系</span>
-      <span class="htag">创作者运营</span>
-      <span class="htag">A/B Test</span>
-      <span class="htag">漏斗分析</span>
-      <span class="htag">内容生态</span>
-      <span class="htag">从0到1</span>
+      <span class="htag" data-i18n="tag_safety">安全治理</span>
+      <span class="htag" data-i18n="tag_genai">GenAI 评测体系</span>
+      <span class="htag" data-i18n="tag_creator">创作者运营</span>
+      <span class="htag" data-i18n="tag_ab">A/B Test</span>
+      <span class="htag" data-i18n="tag_funnel">漏斗分析</span>
+      <span class="htag" data-i18n="tag_content">内容生态</span>
+      <span class="htag" data-i18n="tag_zero">从0到1</span>
     </div>
   </div>
   <div class="scroll-hint"><span>SCROLL</span><span class="line"></span></div>
@@ -642,10 +664,10 @@ footer span {
 <!-- STATS -->
 <section class="sec" style="padding-bottom: 0;">
   <div class="stats-row rv">
-    <div class="stat"><span class="stat-n"><span class="count" data-to="3758" data-suffix="">0</span>单/天</span><span class="stat-l">身份仿冒/肖像投诉 目标入口日均</span></div>
-    <div class="stat"><span class="stat-n"><span class="count" data-to="94" data-suffix="%">0</span></span><span class="stat-l">GenAI 送审通过率（↑ from 35%）</span></div>
-    <div class="stat"><span class="stat-n">+<span class="count" data-to="700" data-suffix="%">0</span></span><span class="stat-l">大促 GMV 单次最高提升</span></div>
-    <div class="stat"><span class="stat-n"><span class="count" data-to="68" data-suffix="%">0</span></span><span class="stat-l">尾部创作者流失率相对降低</span></div>
+    <div class="stat"><span class="stat-n"><span class="count" data-to="3758" data-suffix="">0</span><span data-i18n="stat_unit_day">单/天</span></span><span class="stat-l" data-i18n="stat1_l">身份仿冒/肖像投诉 目标入口日均</span></div>
+    <div class="stat"><span class="stat-n"><span class="count" data-to="94" data-suffix="%">0</span></span><span class="stat-l" data-i18n="stat2_l">GenAI 送审通过率（↑ from 35%）</span></div>
+    <div class="stat"><span class="stat-n">+<span class="count" data-to="700" data-suffix="%">0</span></span><span class="stat-l" data-i18n="stat3_l">大促 GMV 单次最高提升</span></div>
+    <div class="stat"><span class="stat-n"><span class="count" data-to="68" data-suffix="%">0</span></span><span class="stat-l" data-i18n="stat4_l">尾部创作者流失率相对降低</span></div>
   </div>
 </section>
 
@@ -660,30 +682,30 @@ footer span {
 
     <div class="pcard wide rv" data-detail="tencent">
       <div>
-        <div class="pmeta"><span class="pyear">2026 — 至今</span><span class="pcat b">Trust &amp; Safety</span></div>
-        <h3 class="ptitle">微信视频号<br>投诉后可感知治理闭环</h3>
-        <p class="pdesc">面向身份仿冒与肖像侵权场景，把权利人「投诉后进入黑箱」的等待与模糊反馈，重构为账号状态外显 → 高可信识别与可逆止损 → 结单结果透传 → 满意度与行为验证的四段闭环。定义母题与规则，完成对象建模、去重、解除与处罚映射，推动设计/研发/策略/测试/数据协同落地。</p>
+        <div class="pmeta"><span class="pyear" data-i18n="yr_tencent">2026 — 至今</span><span class="pcat b">Trust &amp; Safety</span></div>
+        <h3 class="ptitle" data-i18n="pt_tencent">微信视频号<br>投诉后可感知治理闭环</h3>
+        <p class="pdesc" data-i18n="pd_tencent">面向身份仿冒与肖像侵权场景，把权利人「投诉后进入黑箱」的等待与模糊反馈，重构为账号状态外显 → 高可信识别与可逆止损 → 结单结果透传 → 满意度与行为验证的四段闭环。定义母题与规则，完成对象建模、去重、解除与处罚映射，推动设计/研发/策略/测试/数据协同落地。</p>
         <div class="pkpis">
-          <div><span class="kpi-v b">4段</span><span class="kpi-d">用户时刻闭环</span></div>
-          <div><span class="kpi-v b">10+</span><span class="kpi-d">功能 / 数据 / 设计需求</span></div>
-          <div><span class="kpi-v b">可逆</span><span class="kpi-d">等待期先行止损</span></div>
+          <div><span class="kpi-v b">4段</span><span class="kpi-d" data-i18n="k_tencent1">用户时刻闭环</span></div>
+          <div><span class="kpi-v b">10+</span><span class="kpi-d" data-i18n="k_tencent2">功能 / 数据 / 设计需求</span></div>
+          <div><span class="kpi-v b" data-i18n="kv_reversible">可逆</span><span class="kpi-d" data-i18n="k_tencent3">等待期先行止损</span></div>
         </div>
-        <span class="pmore"><span class="box">+</span>展开项目深读</span>
+        <span class="pmore"><span class="box">+</span><span data-i18n="more">展开项目深读</span></span>
       </div>
-      <div class="pbignum blue"><span>4</span>段</div>
+      <div class="pbignum blue"><span>4</span><span data-i18n="unit_seg">段</span></div>
       <div class="parrow">↗</div>
     </div>
 
     <div class="pcard wide rv" data-detail="genai">
       <div>
         <div class="pmeta"><span class="pyear">2023 — 2024</span><span class="pcat g">GenAI</span></div>
-        <h3 class="ptitle">TIKTOK GENAI<br>评测体系</h3>
-        <p class="pdesc">面对模型生成质量不稳定、错误不可复现的核心痛点，从0到1搭建固定样本池、错误标签与评分维度，制定双周 A/B 回放标准，形成可复用benchmark 流程。推动修复地区价格抓取失败、商品特征幻觉等高频问题，送审通过率从 35% 提升至 94%。</p>
+        <h3 class="ptitle" data-i18n="pt_genai">TIKTOK GENAI<br>评测体系</h3>
+        <p class="pdesc" data-i18n="pd_genai">面对模型生成质量不稳定、错误不可复现的核心痛点，从0到1搭建固定样本池、错误标签与评分维度，制定双周 A/B 回放标准，形成可复用benchmark 流程。推动修复地区价格抓取失败、商品特征幻觉等高频问题，送审通过率从 35% 提升至 94%。</p>
         <div class="pkpis">
-          <div><span class="kpi-v">35%→94%</span><span class="kpi-d">送审通过率</span></div>
-          <div><span class="kpi-v">0→1</span><span class="kpi-d">Benchmark 体系搭建</span></div>
+          <div><span class="kpi-v">35%→94%</span><span class="kpi-d" data-i18n="k_genai1">送审通过率</span></div>
+          <div><span class="kpi-v">0→1</span><span class="kpi-d" data-i18n="k_genai2">Benchmark 体系搭建</span></div>
         </div>
-        <span class="pmore"><span class="box">+</span>展开项目深读</span>
+        <span class="pmore"><span class="box">+</span><span data-i18n="more">展开项目深读</span></span>
       </div>
       <div class="pbignum"><span>94</span>%</div>
       <div class="parrow">↗</div>
@@ -691,50 +713,50 @@ footer span {
 
     <div class="pcard rv" data-detail="copilot">
       <div class="pmeta"><span class="pyear">2023 — 2024</span><span class="pcat g">Prompt Eng.</span></div>
-      <h3 class="ptitle">COPILOT<br>采纳率优化</h3>
-      <p class="pdesc">围绕创意生成/灵感给予场景，把instruction 拆成角色、目标、约束、格式与反例，每轮只改少量变量保证归因清楚，采纳率从 11% 翻倍至 23%。</p>
+      <h3 class="ptitle" data-i18n="pt_copilot">COPILOT<br>采纳率优化</h3>
+      <p class="pdesc" data-i18n="pd_copilot">围绕创意生成/灵感给予场景，把instruction 拆成角色、目标、约束、格式与反例，每轮只改少量变量保证归因清楚，采纳率从 11% 翻倍至 23%。</p>
       <div class="pkpis">
-        <div><span class="kpi-v b">11%→23%</span><span class="kpi-d">采纳率翻倍</span></div>
+        <div><span class="kpi-v b">11%→23%</span><span class="kpi-d" data-i18n="k_copilot1">采纳率翻倍</span></div>
       </div>
-      <span class="pmore"><span class="box">+</span>展开项目深读</span>
+      <span class="pmore"><span class="box">+</span><span data-i18n="more">展开项目深读</span></span>
       <div class="parrow">↗</div>
     </div>
 
     <div class="pcard rv" data-detail="creator">
       <div class="pmeta"><span class="pyear">2025</span><span class="pcat b">Creator Growth</span></div>
-      <h3 class="ptitle">创作者分层<br>增长策略</h3>
-      <p class="pdesc">按头中尾三层创作者差异化激励：尾部首发任务降低流失，中部教育与模板引导提升稳定供给，头部以冲榜与确定性曝光维持核心供给，高阶创作者触达约 4 万。</p>
+      <h3 class="ptitle" data-i18n="pt_creator">创作者分层<br>增长策略</h3>
+      <p class="pdesc" data-i18n="pd_creator">按头中尾三层创作者差异化激励：尾部首发任务降低流失，中部教育与模板引导提升稳定供给，头部以冲榜与确定性曝光维持核心供给，高阶创作者触达约 4 万。</p>
       <div class="pkpis">
-        <div><span class="kpi-v b">-68%</span><span class="kpi-d">尾部流失率相对下降</span></div>
-        <div><span class="kpi-v b">4万</span><span class="kpi-d">创作者触达</span></div>
+        <div><span class="kpi-v b">-68%</span><span class="kpi-d" data-i18n="k_creator1">尾部流失率相对下降</span></div>
+        <div><span class="kpi-v b" data-i18n="kv_40k">4万</span><span class="kpi-d" data-i18n="k_creator2">创作者触达</span></div>
       </div>
-      <span class="pmore"><span class="box">+</span>展开项目深读</span>
+      <span class="pmore"><span class="box">+</span><span data-i18n="more">展开项目深读</span></span>
       <div class="parrow">↗</div>
     </div>
 
     <div class="pcard rv" data-detail="hotspot">
       <div class="pmeta"><span class="pyear">2025</span><span class="pcat p">Content Ops</span></div>
-      <h3 class="ptitle">爆款模板<br>热点机制</h3>
-      <p class="pdesc">把依赖网感的选题转成可复用输入机制：统一自动榜单与人工灵感，建立热点池、促产日历、创作者教育与复盘卡片，高质爆款模板等级季度环比 +32%。</p>
+      <h3 class="ptitle" data-i18n="pt_hotspot">爆款模板<br>热点机制</h3>
+      <p class="pdesc" data-i18n="pd_hotspot">把依赖网感的选题转成可复用输入机制：统一自动榜单与人工灵感，建立热点池、促产日历、创作者教育与复盘卡片，高质爆款模板等级季度环比 +32%。</p>
       <div class="pkpis">
-        <div><span class="kpi-v p">+32%</span><span class="kpi-d">高等级模板季度环比</span></div>
-        <div><span class="kpi-v p">+22%</span><span class="kpi-d">模板曝光月环比</span></div>
+        <div><span class="kpi-v p">+32%</span><span class="kpi-d" data-i18n="k_hotspot1">高等级模板季度环比</span></div>
+        <div><span class="kpi-v p">+22%</span><span class="kpi-d" data-i18n="k_hotspot2">模板曝光月环比</span></div>
       </div>
-      <span class="pmore"><span class="box">+</span>展开项目深读</span>
+      <span class="pmore"><span class="box">+</span><span data-i18n="more">展开项目深读</span></span>
       <div class="parrow">↗</div>
     </div>
 
     <div class="pcard wide rv" data-detail="farfetch">
       <div>
         <div class="pmeta"><span class="pyear">2023</span><span class="pcat r">E-Commerce</span></div>
-        <h3 class="ptitle">FARFETCH<br>KOC 双生态运营</h3>
-        <p class="pdesc">面对「只偏带货生态单调、只偏内容难承接 GMV」的矛盾，设计内容型与带货型双类型KOC 任务包与激励规则，用 SOP 明确节点、Owner 与验收。策划 8 次大促，单次 GMV 较活动前同周期基线提升 700%（参与推动），同步挖掘 3 条 T0 级产品需求。</p>
+        <h3 class="ptitle" data-i18n="pt_farfetch">FARFETCH<br>KOC 双生态运营</h3>
+        <p class="pdesc" data-i18n="pd_farfetch">面对「只偏带货生态单调、只偏内容难承接 GMV」的矛盾，设计内容型与带货型双类型KOC 任务包与激励规则，用 SOP 明确节点、Owner 与验收。策划 8 次大促，单次GMV 较活动前同周期基线提升 700%（参与推动），同步挖掘 3 条 T0 级产品需求。</p>
         <div class="pkpis">
-          <div><span class="kpi-v r">+700%</span><span class="kpi-d">单次 GMV uplift</span></div>
-          <div><span class="kpi-v r">8次</span><span class="kpi-d">大促全链路落地</span></div>
-          <div><span class="kpi-v r">3条</span><span class="kpi-d">T0 产品需求推动</span></div>
+          <div><span class="kpi-v r">+700%</span><span class="kpi-d" data-i18n="k_farfetch1">单次 GMV uplift</span></div>
+          <div><span class="kpi-v r" data-i18n="kv_8times">8次</span><span class="kpi-d" data-i18n="k_farfetch2">大促全链路落地</span></div>
+          <div><span class="kpi-v r" data-i18n="kv_3reqs">3条</span><span class="kpi-d" data-i18n="k_farfetch3">T0 产品需求推动</span></div>
         </div>
-        <span class="pmore"><span class="box">+</span>展开项目深读</span>
+        <span class="pmore"><span class="box">+</span><span data-i18n="more">展开项目深读</span></span>
       </div>
       <div class="pbignum red"><span>+7</span>×</div>
       <div class="parrow">↗</div>
@@ -742,25 +764,25 @@ footer span {
 
     <div class="pcard rv" data-detail="oversea">
       <div class="pmeta"><span class="pyear">2026</span><span class="pcat g">Decision</span></div>
-      <h3 class="ptitle">海外WECHAT<br>机会判断</h3>
-      <p class="pdesc">探索项目的有效产出，也可以是停止一项收益上限不足的重投入。测算消费盘、供给盘与发表渗透上限后，给出阶段性 no-go，并保留低成本受控试点期权。</p>
+      <h3 class="ptitle" data-i18n="pt_oversea">海外WECHAT<br>机会判断</h3>
+      <p class="pdesc" data-i18n="pd_oversea">探索项目的有效产出，也可以是停止一项收益上限不足的重投入。测算消费盘、供给盘与发表渗透上限后，给出阶段性 no-go，并保留低成本受控试点期权。</p>
       <div class="pkpis">
-        <div><span class="kpi-v">NO-GO</span><span class="kpi-d">阶段性不立项</span></div>
-        <div><span class="kpi-v">~5万</span><span class="kpi-d">新增发表用户理论上限</span></div>
+        <div><span class="kpi-v">NO-GO</span><span class="kpi-d" data-i18n="k_oversea1">阶段性不立项</span></div>
+        <div><span class="kpi-v" data-i18n="kv_50k">~5万</span><span class="kpi-d" data-i18n="k_oversea2">新增发表用户理论上限</span></div>
       </div>
-      <span class="pmore"><span class="box">+</span>展开项目深读</span>
+      <span class="pmore"><span class="box">+</span><span data-i18n="more">展开项目深读</span></span>
       <div class="parrow">↗</div>
     </div>
 
     <div class="pcard rv" data-detail="r2games">
       <div class="pmeta"><span class="pyear">2022</span><span class="pcat p">Community</span></div>
-      <h3 class="ptitle">R2GAMES<br>社区增长</h3>
-      <p class="pdesc">用活动规则拉动参与，用内容资产与固定栏目承接活动后回访，结构化收集 20+ 产品反馈推动迭代，沉淀可复用 SOP。</p>
+      <h3 class="ptitle" data-i18n="pt_r2games">R2GAMES<br>社区增长</h3>
+      <p class="pdesc" data-i18n="pd_r2games">用活动规则拉动参与，用内容资产与固定栏目承接活动后回访，结构化收集 20+ 产品反馈推动迭代，沉淀可复用 SOP。</p>
       <div class="pkpis">
-        <div><span class="kpi-v p">10万+</span><span class="kpi-d">推文总点击</span></div>
-        <div><span class="kpi-v p">5000+</span><span class="kpi-d">活动留言</span></div>
+        <div><span class="kpi-v p">10万+</span><span class="kpi-d" data-i18n="k_r2games1">推文总点击</span></div>
+        <div><span class="kpi-v p">5000+</span><span class="kpi-d" data-i18n="k_r2games2">活动留言</span></div>
       </div>
-      <span class="pmore"><span class="box">+</span>展开项目深读</span>
+      <span class="pmore"><span class="box">+</span><span data-i18n="more">展开项目深读</span></span>
       <div class="parrow">↗</div>
     </div>
 
@@ -777,82 +799,82 @@ footer span {
   <div>
     <div class="exp-item rv">
       <div class="exp-left">
-        <span class="exp-co">腾讯<br>微信视频号</span>
-        <span class="exp-period">2026.05 — 至今</span>
+        <span class="exp-co" data-i18n="exp1_co">腾讯<br>微信视频号</span>
+        <span class="exp-period" data-i18n="exp1_period">2026.05 — 至今</span>
       </div>
       <div class="exp-mid"></div>
       <div class="exp-right">
         <span class="exp-role">Product Operations · Guangzhou</span>
-        <div class="exp-head">安全治理 × 投诉后可感知治理闭环</div>
+        <div class="exp-head" data-i18n="exp1_head">安全治理 × 投诉后可感知治理闭环</div>
         <ul class="exp-list">
-          <li>负责身份仿冒与肖像侵权投诉体验，把权利人投诉后的黑箱重构为「账号状态外显 - 高可信识别与可逆止损 - 结单结果透传 - 满意度验证」四段闭环，覆盖账号与内容两类场景</li>
-          <li>梳理处罚 reason / oper / 优先级与用户侧文案映射，完成本投诉结果透传与通知去重规则，账号状态外显与临时限制能力进入灰度/推全</li>
-          <li>累计推动 10+ 功能 / 数据 / 设计需求，定义命中量、覆盖率、成功率、兜底占比等上线后监控口径，并区分「交付状态」与「业务效果」</li>
-          <li>探索海外视频号供给侧增长，用消费盘、供给盘与发表渗透上限测算给出阶段性 no-go 判断</li>
+          <li data-i18n="exp1_li1">负责身份仿冒与肖像侵权投诉体验，把权利人投诉后的黑箱重构为「账号状态外显- 高可信识别与可逆止损 - 结单结果透传 - 满意度验证」四段闭环，覆盖账号与内容两类场景</li>
+          <li data-i18n="exp1_li2">梳理处罚 reason / oper / 优先级与用户侧文案映射，完成本投诉结果透传与通知去重规则，账号状态外显与临时限制能力进入灰度/推全</li>
+          <li data-i18n="exp1_li3">累计推动 10+ 功能 / 数据 / 设计需求，定义命中量、覆盖率、成功率、兜底占比等上线后监控口径，并区分「交付状态」与「业务效果」</li>
+          <li data-i18n="exp1_li4">探索海外视频号供给侧增长，用消费盘、供给盘与发表渗透上限测算给出阶段性 no-go 判断</li>
         </ul>
       </div>
     </div>
     <div class="exp-item rv">
       <div class="exp-left">
-        <span class="exp-co">字节跳动<br>TikTok</span>
+        <span class="exp-co" data-i18n="exp2_co">字节跳动<br>TikTok</span>
         <span class="exp-period">2025.03 — 2025.07</span>
       </div>
       <div class="exp-mid"></div>
       <div class="exp-right">
         <span class="exp-role">Product Operations · Shanghai</span>
-        <div class="exp-head">爆款运营 × 创作者增长</div>
+        <div class="exp-head" data-i18n="exp2_head">爆款运营 × 创作者增长</div>
         <ul class="exp-list">
-          <li>搭建热点信号捕捉与周度复盘机制，统一榜单与灵感输入，输出促产日历，高质爆款模板等级季度环比 +32%</li>
-          <li>高阶创作者触达约 4 万，沉淀私域核心创作者群200–300 人</li>
-          <li>按头中尾分层设计差异化激励，尾部创作者流失率相对下降 68%</li>
-          <li>设计版本分层与升级激励，升级率 +38%，模板曝光量月环比 +22%</li>
+          <li data-i18n="exp2_li1">搭建热点信号捕捉与周度复盘机制，统一榜单与灵感输入，输出促产日历，高质爆款模板等级季度环比 +32%</li>
+          <li data-i18n="exp2_li2">高阶创作者触达约 4 万，沉淀私域核心创作者群200–300 人</li>
+          <li data-i18n="exp2_li3">按头中尾分层设计差异化激励，尾部创作者流失率相对下降 68%</li>
+          <li data-i18n="exp2_li4">设计版本分层与升级激励，升级率 +38%，模板曝光量月环比 +22%</li>
         </ul>
       </div>
     </div>
     <div class="exp-item rv">
       <div class="exp-left">
-        <span class="exp-co">字节跳动<br>TikTok</span>
+        <span class="exp-co" data-i18n="exp3_co">字节跳动<br>TikTok</span>
         <span class="exp-period">2023.11 — 2024.04</span>
       </div>
       <div class="exp-mid"></div>
       <div class="exp-right">
         <span class="exp-role">Product Operations · Shanghai</span>
-        <div class="exp-head">GenAI 评测 × Copilot 优化</div>
+        <div class="exp-head" data-i18n="exp3_head">GenAI 评测 × Copilot 优化</div>
         <ul class="exp-list">
-          <li>从0到1搭建 GenAI 送审样本池与错误标签体系，送审通过率 35% → 94%</li>
-          <li>迭代 Copilot instruction 与评测集，采纳率从 11% 翻倍至 23%</li>
-          <li>制定双周迭代验证标准与 A/B 回放口径，形成可复用 benchmark 四件套</li>
+          <li data-i18n="exp3_li1">从0到1搭建 GenAI 送审样本池与错误标签体系，送审通过率 35% → 94%</li>
+          <li data-i18n="exp3_li2">迭代 Copilot instruction 与评测集，采纳率从 11% 翻倍至 23%</li>
+          <li data-i18n="exp3_li3">制定双周迭代验证标准与 A/B 回放口径，形成可复用 benchmark 四件套</li>
         </ul>
       </div>
     </div>
     <div class="exp-item rv">
       <div class="exp-left">
-        <span class="exp-co">Farfetch<br>发发奇</span>
+        <span class="exp-co">Farfetch<br><span data-i18n="exp4_co2">发发奇</span></span>
         <span class="exp-period">2023.08 — 2023.11</span>
       </div>
       <div class="exp-mid"></div>
       <div class="exp-right">
         <span class="exp-role">Product Operations · Shanghai</span>
-        <div class="exp-head">KOC 全链路运营</div>
+        <div class="exp-head" data-i18n="exp4_head">KOC 全链路运营</div>
         <ul class="exp-list">
-          <li>设计内容型与带货型双类型 KOC 任务包，策划 8 次大促，单次 GMV 较活动前同周期基线提升 700%</li>
-          <li>撰写 80+ 激励文章，监测与优化 KOC 激励规则</li>
-          <li>从0到1制定并迭代小红书运营 SOP，挖掘 3 条 T0 级产品需求推动落地</li>
+          <li data-i18n="exp4_li1">设计内容型与带货型双类型 KOC 任务包，策划 8 次大促，单次 GMV 较活动前同周期基线提升 700%</li>
+          <li data-i18n="exp4_li2">撰写 80+ 激励文章，监测与优化 KOC 激励规则</li>
+          <li data-i18n="exp4_li3">从0到1制定并迭代小红书运营 SOP，挖掘 3 条 T0 级产品需求推动落地</li>
         </ul>
       </div>
     </div>
     <div class="exp-item rv">
       <div class="exp-left">
-        <span class="exp-co">芒果 TV</span>
+        <span class="exp-co" data-i18n="exp5_co">芒果 TV</span>
         <span class="exp-period">2023.05 — 2023.08</span>
       </div>
       <div class="exp-mid"></div>
       <div class="exp-right">
         <span class="exp-role">Marketing · Changsha</span>
-        <div class="exp-head">综艺项目营销支持</div>
+        <div class="exp-head" data-i18n="exp5_head">综艺项目营销支持</div>
         <ul class="exp-list">
-          <li>从0到1输出营销手册及招商PPT 初版</li>
-          <li>结合数据与深访输出 2000+ 字用户画像与竞品分析报告</li>
+          <li data-i18n="exp5_li1">从0到1输出营销手册及招商PPT 初版</li>
+          <li data-i18n="exp5_li2">结合数据与深访输出 2000+ 字用户画像与竞品分析报告</li>
         </ul>
       </div>
     </div>
@@ -864,11 +886,11 @@ footer span {
       <div class="exp-mid"></div>
       <div class="exp-right">
         <span class="exp-role">Product Operations · Shenzhen</span>
-        <div class="exp-head">社区内容运营</div>
+        <div class="exp-head" data-i18n="exp6_head">社区内容运营</div>
         <ul class="exp-list">
-          <li>策划评论区活动，用内容资产与固定栏目承接活动后回访</li>
-          <li>撰写 10+ 游戏推文脚本，总点击 10 万+，互动率 ≥ 0.5%</li>
-          <li>结构化收集 20+ 产品反馈并推动 100% 问题迭代</li>
+          <li data-i18n="exp6_li1">策划评论区活动，用内容资产与固定栏目承接活动后回访</li>
+          <li data-i18n="exp6_li2">撰写 10+ 游戏推文脚本，总点击 10 万+，互动率 ≥ 0.5%</li>
+          <li data-i18n="exp6_li3">结构化收集 20+ 产品反馈并推动 100% 问题迭代</li>
         </ul>
       </div>
     </div>
@@ -885,7 +907,7 @@ footer span {
   <div class="sgrid">
     <div class="sblock rv">
       <span class="sicon">⚡</span>
-      <div class="sname">数据分析</div>
+      <div class="sname" data-i18n="sk_data">数据分析</div>
       <div class="stags">
         <span class="stag">A/B Test</span><span class="stag">漏斗分析</span>
         <span class="stag">指标拆解</span><span class="stag">口径校准</span><span class="stag">Excel</span>
@@ -893,7 +915,7 @@ footer span {
     </div>
     <div class="sblock rv">
       <span class="sicon">🤖</span>
-      <div class="sname">GenAI 产品</div>
+      <div class="sname" data-i18n="sk_genai">GenAI 产品</div>
       <div class="stags">
         <span class="stag">Prompt Engineering</span><span class="stag">Benchmark 搭建</span>
         <span class="stag">质量评测体系</span><span class="stag">幻觉问题定位</span>
@@ -901,7 +923,7 @@ footer span {
     </div>
     <div class="sblock rv">
       <span class="sicon">📈</span>
-      <div class="sname">增长运营</div>
+      <div class="sname" data-i18n="sk_growth">增长运营</div>
       <div class="stags">
         <span class="stag">创作者分层</span><span class="stag">激励设计</span>
         <span class="stag">供给侧策略</span><span class="stag">GMV 增长</span>
@@ -909,7 +931,7 @@ footer span {
     </div>
     <div class="sblock rv">
       <span class="sicon">🎯</span>
-      <div class="sname">内容运营</div>
+      <div class="sname" data-i18n="sk_content">内容运营</div>
       <div class="stags">
         <span class="stag">热点机制化</span><span class="stag">爆款供给</span>
         <span class="stag">小红书运营</span><span class="stag">KOC/KOL 生态</span>
@@ -917,7 +939,7 @@ footer span {
     </div>
     <div class="sblock rv">
       <span class="sicon">🛡️</span>
-      <div class="sname">安全治理</div>
+      <div class="sname" data-i18n="sk_safety">安全治理</div>
       <div class="stags">
         <span class="stag">投诉闭环设计</span><span class="stag">高可信识别</span>
         <span class="stag">状态机/对象建模</span><span class="stag">处罚归因映射</span><span class="stag">监控口径</span>
@@ -925,7 +947,7 @@ footer span {
     </div>
     <div class="sblock rv">
       <span class="sicon">🔧</span>
-      <div class="sname">产品支持</div>
+      <div class="sname" data-i18n="sk_prod">产品支持</div>
       <div class="stags">
         <span class="stag">需求定义</span><span class="stag">SOP 搭建</span>
         <span class="stag">跨团队协同</span><span class="stag">Axure · Figma</span>
@@ -934,7 +956,7 @@ footer span {
     </div>
     <div class="sblock rv">
       <span class="sicon">🌍</span>
-      <div class="sname">语言 / 学历</div>
+      <div class="sname" data-i18n="sk_lang">语言 / 学历</div>
       <div class="stags">
         <span class="stag">中文 母语</span><span class="stag">IELTS 7.5</span>
         <span class="stag">Uppsala Univ. 硕士</span>
@@ -954,18 +976,18 @@ footer span {
   <div class="about-grid">
     <div class="aphoto-wrap rv">
       <img src="photo.jpeg" alt="严哲堃" class="aphoto">
-      <div class="aphoto-badge">Product Operations<br>2022 — Present</div>
+      <div class="aphoto-badge" data-i18n="about_badge">Product Operations<br>2022 — Present</div>
     </div>
     <div class="atext rv">
-      <h2>把模糊问题<br>变成机制</h2>
-      <p>我是严哲堃，一名横跨安全治理、GenAI、电商与内容生态的产品运营。我稳定复用的能力，是<span class="ac">识别关键矛盾、建立可执行机制，并用数据决定扩大、调整或停止</span>。拥有微信视频号、TikTok、Farfetch、芒果TV 等头部平台的完整实战经验。</p>
-      <p>我相信最好的运营是「既懂用户，又看数据」——用A/B Test 验证直觉，用漏斗分析找到掉点，用 SOP 让成功可以复制，同时始终为每个数字标清分母、时间窗与能支持到哪一层。目前在微信视频号负责投诉后可感知治理闭环与海外机会判断，并于瑞典乌普萨拉大学攻读数字媒体硕士。</p>
-      <p class="ac">小红书职场类内容 3月、6月全网第一 · 私域用户 500+ · 小宇宙深度对谈主理人</p>
+      <h2 data-i18n="about_h">把模糊问题<br>变成机制</h2>
+      <p data-i18n="about_p1">我是严哲堃，一名横跨安全治理、GenAI、电商与内容生态的产品运营。我稳定复用的能力，是<span class="ac">识别关键矛盾、建立可执行机制，并用数据决定扩大、调整或停止</span>。拥有微信视频号、TikTok、Farfetch、芒果TV 等头部平台的完整实战经验。</p>
+      <p data-i18n="about_p2">我相信最好的运营是「既懂用户，又看数据」——用A/B Test 验证直觉，用漏斗分析找到掉点，用 SOP 让成功可以复制，同时始终为每个数字标清分母、时间窗与能支持到哪一层。目前在微信视频号负责投诉后可感知治理闭环与海外机会判断，并于瑞典乌普萨拉大学攻读数字媒体硕士。</p>
+      <p class="ac" data-i18n="about_p3">小红书职场类内容 3月、6月全网第一 · 私域用户 500+ · 小宇宙深度对谈主理人</p>
       <div class="alist">
-        <div class="arow"><span class="arow-n">①</span>乌普萨拉大学 数字媒体硕士（全额奖学金，2024 — 2026.12）</div>
-        <div class="arow"><span class="arow-n">②</span>台湾大学交换 满修优评 3A+/3A/A- · 英国剑桥大学访学</div>
-        <div class="arow"><span class="arow-n">③</span>武汉轻工大学 广告学 GPA 年级 top 5%</div>
-        <div class="arow"><span class="arow-n">④</span>发表两篇期刊（CPCI 国家级刊物）</div>
+        <div class="arow"><span class="arow-n">①</span><span data-i18n="about_edu1">乌普萨拉大学 数字媒体硕士（全额奖学金，2024 — 2026.12）</span></div>
+        <div class="arow"><span class="arow-n">②</span><span data-i18n="about_edu2">台湾大学交换 满修优评 3A+/3A/A- · 英国剑桥大学访学</span></div>
+        <div class="arow"><span class="arow-n">③</span><span data-i18n="about_edu3">武汉轻工大学 广告学 GPA 年级top 5%</span></div>
+        <div class="arow"><span class="arow-n">④</span><span data-i18n="about_edu4">发表两篇期刊（CPCI 国家级刊物）</span></div>
       </div>
     </div>
   </div>
@@ -974,12 +996,12 @@ footer span {
 <!-- CONTACT -->
 <div class="contact-sec" id="contact">
   <div class="ctitle">LET'S<br>CONNECT</div>
-  <p class="csub">正在寻找产品运营 / 用户增长 / 市场机会，欢迎 reach！微信手机同号</p>
+  <p class="csub" data-i18n="contact_sub">正在寻找产品运营 / 用户增长 / 市场机会，欢迎 reach！微信手机同号</p>
   <div class="clinks">
     <a href="mailto:briankun2022@163.com" class="cbtn">briankun2022@163.com</a>
     <a href="tel:+8615772288557" class="cbtn">157-7228-8557</a>
-    <a href="https://www.xiaoyuzhoufm.com/podcast/695b427fbf09b17285d3e096" target="_blank" rel="noopener" class="cbtn">小宇宙 播客</a>
-    <a href="https://xhslink.cn/m/38jP0KqAzez" target="_blank" rel="noopener" class="cbtn">小红书 主页</a>
+    <a href="https://www.xiaoyuzhoufm.com/podcast/695b427fbf09b17285d3e096" target="_blank" rel="noopener" class="cbtn" data-i18n="contact_podcast">小宇宙 播客</a>
+    <a href="https://xhslink.cn/m/38jP0KqAzez" target="_blank" rel="noopener" class="cbtn" data-i18n="contact_xhs">小红书 主页</a>
   </div>
 </div>
 
@@ -1012,6 +1034,7 @@ footer span {
    不含内部 reason/oper 字段名、具体阈值与内部单量）
    ============================================================ */
 const DETAILS = {
+ zh: {
   tencent: {
     cat: 'Trust & Safety', catClass: 'b', year: '2026 — 至今',
     title: '微信视频号 · 投诉后可感知治理闭环',
@@ -1190,12 +1213,198 @@ const DETAILS = {
     ],
     tags:['活动设计','内容承接','反馈结构化','SOP 沉淀']
   }
+ },
+ en: {
+  tencent: {
+    cat: 'Trust & Safety', catClass: 'b', year: '2026 — Present',
+    title: 'WeChat Channels · Perceivable Post-Complaint Governance Loop',
+    lede: 'Reframing the rights holder\'s <span class="ac">"waiting &amp; vague feedback"</span> after filing a complaint into a governance loop that is perceivable, loss-stopping, explainable and verifiable. The core is not a single feature, but one complete user journey.',
+    blocks: [
+      { type:'flow', h:'Four-Stage Loop · Organized by User Moment', steps:[
+        { t:'Account Status Surfacing', d:'At submission, first answer "has the platform already acted"—surface the current valid verification or penalty state, reducing the "platform did nothing" perception.' },
+        { t:'High-Trust + Reversible Stop', d:'Identify high-trust rights holders via ID-face, personal verification and historical-approval signals; once matched, apply a reversible temporary restriction before final review to shorten the risk-exposure window.' },
+        { t:'Result Translation', d:'Read only the penalty records tied to THIS complaint and merge them into a user-understandable result—never mis-attribute the account\'s unrelated penalties to this complaint.' },
+        { t:'Satisfaction & Verification', d:'Put satisfaction, front-end behavior tracking and back-end timeline into one evidence chain to keep locating problems and feeding them back into product actions.' },
+      ]},
+      { type:'cols', h:'How the Black Box Forms · Two Gaps', points:[
+        { t:'Time Gap', tick:'01', d:'Manual/legal review takes time; infringing content may keep spreading during the wait, and the rights holder bears extra exposure and emotional cost.' },
+        { t:'Information Gap', tick:'02', d:'The backend may already have verification, restriction or deletion actions, yet the front end only shows a vague "handled"—force level and expectation stay misaligned.' },
+      ]},
+      { type:'cols', h:'Key Product Judgements', points:[
+        { t:'From Full Transparency to Key Moments', tick:'▹', d:'Initially aimed to show the full complaint flow and periodic reports; given complex defense/authorization/withdrawal branches and distance from the immediate pain, converged onto three high-value moments—file, wait, close—then added the feedback loop.' },
+        { t:'Reversible-, Owner-, Main-Pool-First', tick:'▹', d:'Restrict early only when high-trust evidence holds and it can roll back; rights-holder-self first, agents phase two; patch the legacy main pool\'s stop &amp; translation first rather than wait for long-term migration.' },
+        { t:'Four Objects Must Not Be Mixed', tick:'▹', d:'Rights subject / complaint object / disposal object / notification object stay independent—avoiding "multiple items counted as multiple notices" or "penalty scope expanding / wrong object released".' },
+        { t:'Delivery ≠ Impact', tick:'▹', d:'Rollout, grayscale and "Ready" are delivery states; shorter risk-exposure time, post-match final approval and satisfaction lift are the business results—pending grayscale post-verification.' },
+      ]},
+      { type:'metrics', h:'Evidence & Boundaries (externally explainable)', items:[
+        { v:'52,610/ 14d', d:'Impersonation & exposed-portrait entries · ~3,758/day', cls:'b' },
+        { v:'4 layers', d:'Accuracy split: valid input / matched object / model match / action risk', cls:'b' },
+        { v:'3,553', d:'Satisfaction responses collected · as baseline & problem structure', cls:'b' },
+        { v:'10+', d:'Feature / data / design requirements driven', cls:'b' },
+      ]},
+      { type:'note', nt:'Metric Red Lines / Guardrails', d:'Coverage ≠ accuracy—a strategy hit only means "entered the early-stop scope"; hit-and-passed-final-review, instant release on rejection, and false-hit cases together approach strategy quality. Data from different pipelines/time windows are not stitched into one funnel; specific thresholds, internal fields and volumes are for personal prep only, not disclosed.' },
+    ],
+    tags:['Problem Definition','State Machine / Object Modeling','Penalty Attribution Mapping','Notification Dedup','Grayscale & Monitoring','Legal Boundary']
+  },
+
+  genai: {
+    cat: 'GenAI', catClass: 'g', year: '2023 — 2024',
+    title: 'TikTok GenAI · Review-Quality Evaluation System',
+    lede: 'Build a <span class="ac">reproducible evaluation language</span> first, then discuss model &amp; prompt tuning—turning "unstable quality, non-reproducible errors, R&amp;D can\'t locate" into an iterable benchmark.',
+    blocks: [
+      { type:'cols', h:'Problem → Mechanism', points:[
+        { t:'Core Pain', tick:'01', d:'Review quality fluctuated, the same error was hard to reproduce, R&D could not locate the source; initial review pass rate ~35%.' },
+        { t:'Solution Mechanism', tick:'02', d:'Fixed task set + error labels + scoring dimensions + biweekly A/B replay—turning subjective "feels off" into attributable structured signals.' },
+      ]},
+      { type:'flow', h:'Reusable Benchmark · Four-Piece Kit', steps:[
+        { t:'Fixed Task Set', d:'Covers real high-frequency and edge scenarios so every round faces the same "exam questions".' },
+        { t:'Fixed Scoring Dims', d:'Score separately on accuracy, verifiability, executability and consistency.' },
+        { t:'Single-Variable Iteration', d:'Change only 1–2 key variables per round to keep attribution clean and avoid multi-factor confusion.' },
+        { t:'Same-Batch Replay', d:'Replay the same sample batch, combined with online core metrics and error-type distribution.' },
+      ]},
+      { type:'metrics', h:'Results', items:[
+        { v:'35% → 94%', d:'Review pass rate', cls:'g' },
+        { v:'0 → 1', d:'Evaluation system from scratch', cls:'g' },
+        { v:'Biweekly', d:'A/B replay iteration cadence', cls:'g' },
+      ]},
+      { type:'note', nt:'Typical Errors → Reproducible Bug Tickets', d:'Turned high-frequency issues like "regional price scraping failure" and "product-feature hallucination" into reproducible bug tickets and supply-input standards. This method is essentially the same as the Tencent project\'s "strategy dry-run, threshold review, final-review replay, fixed samples".' },
+    ],
+    tags:['Fixed Sample Pool','Error-Label System','Scoring Dimensions','Single-Variable Attribution','A/B Replay']
+  },
+
+  copilot: {
+    cat: 'Prompt Engineering', catClass: 'g', year: '2023 — 2024',
+    title: 'Copilot · Adoption-Rate Optimization',
+    lede: 'When output is unstable, first solve <span class="ac">"how to tell whether a change actually worked"</span>, then optimize.',
+    blocks: [
+      { type:'cols', h:'Problem → Mechanism', points:[
+        { t:'Core Pain', tick:'01', d:'Output in ideation/inspiration scenarios was unstable; hard to judge whether an instruction change truly helped; initial adoption rate ~11%.' },
+        { t:'Solution Mechanism', tick:'02', d:'Break instructions into five elements—role, goal, constraint, format, counter-examples—changing few variables per round to keep effects attributable.' },
+      ]},
+      { type:'metrics', h:'Results & Metric Definition', items:[
+        { v:'11% → 23%', d:'Adoption rate doubled', cls:'g' },
+        { v:'Adoption', d:'Primary metric · thumb-up only auxiliary', cls:'g' },
+      ]},
+      { type:'note', nt:'Metric Choice', d:'Use real "adoption" as the primary metric and thumb-up as an auxiliary signal—avoiding "likes" standing in for "real usage" and preventing inflated metrics.' },
+    ],
+    tags:['Instruction Decomposition','Single-Variable Experiment','Adoption Rate','Eval Set']
+  },
+
+  creator: {
+    cat: 'Creator Growth', catClass: 'b', year: '2025',
+    title: 'Creator Tiering · Growth Strategy',
+    lede: 'Replace generic incentives with a mechanism that <span class="ac">solves a different problem per tier</span>—the core conflict differs across creator tiers.',
+    blocks: [
+      { type:'flow', h:'Head / Mid / Tail · Differentiated Actions', steps:[
+        { t:'Tail', d:'Problem: no feedback on first post, high drop on second. Action: first- & second-post tasks, low-barrier feedback. Goal: 7-day re-post, churn rate.' },
+        { t:'Mid', d:'Problem: quality volatility, no stable method. Action: education, template guidance, quality gate. Goal: stable posting, high-quality rate.' },
+        { t:'Head', d:'Problem: cash incentives have weak marginal effect. Action: leaderboards, honor, guaranteed exposure. Goal: stable core supply.' },
+        { t:'Funnel', d:'Locate each tier\'s drop-off with one funnel: Exposure → CTR → Start rate → Submit rate.' },
+      ]},
+      { type:'metrics', h:'Results', items:[
+        { v:'-68%', d:'Tail-creator churn (relative decrease)', cls:'b' },
+        { v:'~40k', d:'Advanced creators reached', cls:'b' },
+        { v:'+38%', d:'Version upgrade rate', cls:'b' },
+        { v:'+22%', d:'Template exposure MoM', cls:'b' },
+      ]},
+      { type:'note', nt:'Expression Boundary', d:'The -68% churn is a relative decrease; for interviews/external use, add pre/post absolute values and the cohort time window. The core capability is turning experiential judgement into input standards, states and funnels, and using post-hoc review to decide the next action.' },
+    ],
+    tags:['Creator Tiering','Incentive Design','Funnel Analysis','Cohort Review']
+  },
+
+  hotspot: {
+    cat: 'Content Ops', catClass: 'p', year: '2025',
+    title: 'Viral Templates · Trend Mechanization',
+    lede: 'Turn topic selection that relies on <span class="ac">individual instinct</span> into a reusable, reviewable <span class="ac">input mechanism</span>.',
+    blocks: [
+      { type:'cols', h:'Judgement → Action', points:[
+        { t:'Key Judgement', tick:'01', d:'Chasing trend coverage adds noise; reducing the number of main pushes and raising "templatizable hits" matters more.' },
+        { t:'Mechanism Action', tick:'02', d:'Unify auto-leaderboard and human inspiration inputs; build a trend pool, production calendar, creator education and review cards.' },
+      ]},
+      { type:'metrics', h:'Results', items:[
+        { v:'+32%', d:'High-grade viral template level · QoQ', cls:'p' },
+        { v:'+22%', d:'Template exposure · MoM', cls:'p' },
+        { v:'single-digit%', d:'Submit rate improvement (conservative)', cls:'p' },
+      ]},
+      { type:'note', nt:'Metric Note', d:'Submit rate is expressed conservatively as a single-digit percentage-point improvement. The core value is turning "instinct" into a team-reusable input pool and review cards, reducing dependence on individual experience.' },
+    ],
+    tags:['Trend Pool','Production Calendar','Creator Education','Review Cards']
+  },
+
+  farfetch: {
+    cat: 'E-Commerce', catClass: 'r', year: '2023',
+    title: 'Farfetch · KOC Dual-Ecosystem Operations',
+    lede: 'Solve the "content vs. conversion" conflict with <span class="ac">dual-type supply</span>: content-type KOCs grow reach, sales-type KOCs carry GMV.',
+    blocks: [
+      { type:'cols', h:'Conflict → Mechanism', points:[
+        { t:'Key Conflict', tick:'01', d:'Over-indexing on selling makes the ecosystem monotonous; over-indexing on content struggles to carry GMV stably.' },
+        { t:'Dual-Eco Mechanism', tick:'02', d:'Content-type KOCs drive reach & content form, sales-type KOCs carry orders—each with its own task pack, incentive and creative spec.' },
+        { t:'SOP Delivery', tick:'03', d:'Use SOPs to define each campaign node, owner and acceptance so 8 campaigns are repeatably deliverable.' },
+        { t:'Feed Back to Product', tick:'04', d:'Surface and drive 3 T0-level product requirements from front-line operations.' },
+      ]},
+      { type:'metrics', h:'Results', items:[
+        { v:'+700%', d:'Single-campaign GMV vs. same-period pre-campaign baseline', cls:'r' },
+        { v:'8', d:'Full-chain campaigns delivered', cls:'r' },
+        { v:'80+', d:'Incentive articles written', cls:'r' },
+        { v:'3', d:'T0-level product requirements driven', cls:'r' },
+      ]},
+      { type:'note', nt:'Expression Boundary', d:'GMV +700% needs the baseline stated, keeping co-factors like campaign organic traffic, ad slots and discount depth; externally phrased as "contributed to", avoiding attributing joint effects to a single action.' },
+    ],
+    tags:['KOC Dual-Eco','Task-Pack Design','Campaign SOP','Requirement Mining']
+  },
+
+  oversea: {
+    cat: 'Decision Quality', catClass: 'g', year: '2026',
+    title: 'Overseas WeChat · Opportunity Call (No-Go)',
+    lede: 'A valid output of an exploration project can be <span class="ac">stopping a heavy investment whose upside is insufficient</span>—a phased no-go by calculation, not intuition.',
+    blocks: [
+      { type:'flow', h:'Decision Path', steps:[
+        { t:'C-side Consumption', d:'Overseas per-user dwell & exposure are not low, but the overall pool is limited—the question shifts from "will users watch" to "how much new supply it brings".' },
+        { t:'Author Supply', d:'High performance concentrates on celebrities/top IP; mid-low-follower authors are weak—great cases don\'t prove replicability.' },
+        { t:'Posting Penetration', d:'Overseas ~0.5%, domestic ~1%. Even doubled, the theoretical ceiling of new posting users is ~50k.' },
+        { t:'Investment Cost', d:'Requires real-name, admission, review, distribution, governance, legal and ops—clearly higher than a single entry-point change.' },
+      ]},
+      { type:'metrics', h:'Conclusion', items:[
+        { v:'NO-GO', d:'Phased "do not launch" for now', cls:'g' },
+        { v:'~50k', d:'Theoretical ceiling of new posting users', cls:'g' },
+        { v:'30–50', d:'Low-cost controlled-pilot size', cls:'g' },
+      ]},
+      { type:'note', nt:'Keep the Option', d:'Not a flat rejection: keep a 4–6 week controlled pilot with 30–50 high-trust authors, basic posting only; if multiple mid-low-follower authors stably beat their tier baseline on similar content with controllable governance cost, re-open the assessment.' },
+    ],
+    tags:['Opportunity Sizing','Upside Ceiling','Capability Cost','Controlled Pilot']
+  },
+
+  r2games: {
+    cat: 'Community', catClass: 'p', year: '2022',
+    title: 'R2Games · Community Growth',
+    lede: 'Drive participation with activity rules, use <span class="ac">content assets &amp; fixed columns</span> to carry post-activity revisits, turning short-term activities into reusable assets.',
+    blocks: [
+      { type:'cols', h:'Mechanism → Action', points:[
+        { t:'Participation Mechanism', tick:'01', d:'Design activity rules to drive comment-section participation; use content assets & fixed columns to carry post-activity revisits.' },
+        { t:'Feedback Loop', tick:'02', d:'Structurally collect 20+ product feedback items and drive iteration; precipitate reusable SOPs.' },
+      ]},
+      { type:'metrics', h:'Results (traceable metrics)', items:[
+        { v:'100k+', d:'Total post clicks', cls:'p' },
+        { v:'5,000+', d:'Activity comments', cls:'p' },
+        { v:'≥0.5%', d:'Post engagement rate', cls:'p' },
+        { v:'20+', d:'Structured product feedback', cls:'p' },
+      ]},
+      { type:'note', nt:'Metric Note', d:'Older material also cites DAU +219%, but keeping it would require the pre-activity baseline, activity window and post-activity retention; externally, traceable click & comment data are preferred.' },
+    ],
+    tags:['Activity Design','Content Carry-over','Structured Feedback','SOP Precipitation']
+  }
+ }
 };
 
 /* ============================================================
    动效：GSAP +ScrollTrigger（含prefers-reduced-motion 适配）
    ============================================================ */
 gsap.registerPlugin(ScrollTrigger);
+
+/* 当前语言（默认中文，或读取本地存储） */
+let LANG = (function(){
+  try { return localStorage.getItem('portfolio_lang') || 'zh'; } catch(e){ return 'zh'; }
+})();
 
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1369,9 +1578,11 @@ function buildBlock(b){
   return '';
 }
 
+let currentDetailKey = null;
 function openDrawer(key){
-  const d = DETAILS[key];
+  const d = DETAILS[LANG] && DETAILS[LANG][key]? DETAILS[LANG][key] : DETAILS.zh[key];
   if (!d) return;
+  currentDetailKey = key;
   lastFocused = document.activeElement;
 
   dEye.innerHTML = `<span class="dcat pcat ${d.catClass}" style="color:${
@@ -1379,7 +1590,7 @@ function openDrawer(key){
   }">${d.cat}</span><span>${d.year}</span>`;
   dTitle.textContent = d.title;
 
-  const tagRow = d.tags ? `<div class="d-block d-anim"><div class="d-h">能力标签</div><div class="d-tagrow">${
+  const tagRow = d.tags ? `<div class="d-block d-anim"><div class="d-h">${LANG==='en'?'Capability Tags':'能力标签'}</div><div class="d-tagrow">${
     d.tags.map(t=>`<span class="d-tag">${t}</span>`).join('')
   }</div></div>` : '';
 
@@ -1414,6 +1625,7 @@ function closeDrawer(){
     overlay.classList.remove('open');
     drawer.setAttribute('aria-hidden','true');
     document.body.classList.remove('locked');
+    currentDetailKey = null;
     if (lastFocused) lastFocused.focus();
   };
   if (prefersReduced) {
@@ -1438,6 +1650,162 @@ document.getElementById('drawerClose').addEventListener('click', closeDrawer);
 document.getElementById('drawerGrip').addEventListener('click', closeDrawer);
 overlay.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+/* ============================================================
+   i18n 静态文案字典（en）。zh 直接用 DOM 原文，只在切到 en 时替换。
+   ============================================================ */
+const I18N = {
+  // nav
+  nav_work:'WORK', nav_exp:'EXPERIENCE', nav_about:'ABOUT', nav_contact:'CONTACT',
+  // hero
+  hero_eyebrow:'Product Operations · Trust &amp; Safety · GenAI · Content Ecosystem',
+  hero_desc:'Let data speak, let content instinct drive growth. Full-chain hands-on experience across WeChat Channels · TikTok · Farfetch · Mango TV, spanning trust &amp; safety, GenAI evaluation, creator ecosystem and e-commerce growth.',
+  tag_safety:'Trust &amp; Safety', tag_genai:'GenAI Evaluation', tag_creator:'Creator Ops',
+  tag_ab:'A/B Test', tag_funnel:'Funnel Analysis', tag_content:'Content Ecosystem', tag_zero:'0→1',
+  // stats
+  stat_unit_day:'/day',
+  stat1_l:'Impersonation / portrait complaints · target-entry daily avg',
+  stat2_l:'GenAI review pass rate (↑ from 35%)',
+  stat3_l:'Peak single-campaign GMV uplift',
+  stat4_l:'Tail-creator churn relative decrease',
+  // project cards
+  more:'Open deep-dive', unit_seg:'stages',
+  yr_tencent:'2026 — Present',
+  pt_tencent:'WeChat Channels<br>Perceivable Governance Loop',
+  pd_tencent:'For impersonation & portrait-infringement scenarios, reframed the rights holder\'s "black box after filing" into a four-stage loop: account-status surfacing → high-trust identification & reversible stop → result translation → satisfaction & behavior verification. Defined the theme and rules, completed object modeling, dedup, release and penalty mapping, and drove design / dev / strategy / QA / data collaboration.',
+  k_tencent1:'user-moment loop', k_tencent2:'feature / data / design reqs', k_tencent3:'early stop in wait window', kv_reversible:'Reversible',
+  pt_genai:'TIKTOK GENAI<br>Evaluation System',
+  pd_genai:'Facing unstable model output and non-reproducible errors, built a fixed sample pool, error labels and scoring dimensions from scratch, set a biweekly A/B replay standard, and formed a reusable benchmark. Drove fixes for high-frequency issues like regional price-scraping failures and product-feature hallucinations; review pass rate rose from 35% to 94%.',
+  k_genai1:'review pass rate', k_genai2:'benchmark system built',
+  pt_copilot:'COPILOT<br>Adoption Optimization',
+  pd_copilot:'For ideation/inspiration scenarios, broke instructions into role, goal, constraint, format and counter-examples, changing few variables per round for clean attribution—adoption rate doubled from 11% to 23%.',
+  k_copilot1:'adoption rate doubled',
+  pt_creator:'Creator Tiering<br>Growth Strategy',
+  pd_creator:'Differentiated incentives by head/mid/tail: first-post tasks cut tail churn, education & template guidance lift stable mid supply, leaderboards & guaranteed exposure keep head supply—~40k advanced creators reached.',
+  k_creator1:'tail churn relative decrease', k_creator2:'creators reached', kv_40k:'~40k',
+  pt_hotspot:'Viral Templates<br>Trend Mechanization',
+  pd_hotspot:'Turned instinct-driven topic selection into a reusable input mechanism: unified auto-leaderboard and human inspiration, built a trend pool, production calendar, creator education and review cards—high-grade viral template level +32% QoQ.',
+  k_hotspot1:'high-grade template QoQ', k_hotspot2:'template exposure MoM',
+  pt_farfetch:'FARFETCH<br>KOC Dual-Ecosystem Ops',
+  pd_farfetch:'To resolve the "sales-only is monotonous, content-only can\'t carry GMV" conflict, designed content-type and sales-type KOC task packs and incentives, using SOPs to define nodes, owners and acceptance. Ran 8 campaigns, single-campaign GMV +700% vs. same-period pre-campaign baseline (contributed to), and surfaced 3 T0-level product requirements.',
+  k_farfetch1:'single-campaign GMV uplift', k_farfetch2:'full-chain campaigns', k_farfetch3:'T0 product reqs driven', kv_8times:'8', kv_3reqs:'3',
+  pt_oversea:'OVERSEAS WECHAT<br>Opportunity Call',
+  pd_oversea:'A valid output of an exploration project can be stopping a heavy investment with insufficient upside. After sizing consumption, supply and posting-penetration ceilings, gave a phased no-go while keeping a low-cost controlled-pilot option.',
+  k_oversea1:'phased no-launch', k_oversea2:'theoretical ceiling of new posters', kv_50k:'~50k',
+  pt_r2games:'R2GAMES<br>Community Growth',
+  pd_r2games:'Drove participation with activity rules, used content assets and fixed columns to carry post-activity revisits, structurally collected 20+ product feedback items to drive iteration, and precipitated reusable SOPs.',
+  k_r2games1:'total post clicks', k_r2games2:'activity comments',
+  // experience
+  exp1_co:'Tencent<br>WeChat Channels', exp1_period:'2026.05 — Present',
+  exp1_head:'Trust & Safety × Perceivable Post-Complaint Loop',
+  exp1_li1:'Owned the impersonation & portrait-infringement complaint experience, reframing the post-complaint black box into a four-stage loop—account-status surfacing / high-trust identification & reversible stop / result translation / satisfaction verification—covering both account and content cases.',
+  exp1_li2:'Mapped penalty reason / oper / priority to user-facing copy, completed this-complaint result translation and notification dedup rules; account-status surfacing and temporary-restriction capabilities entered grayscale / rollout.',
+  exp1_li3:'Drove 10+ feature / data / design requirements; defined post-launch monitoring metrics (hit volume, coverage, success rate, fallback ratio) and distinguished "delivery state" from "business impact".',
+  exp1_li4:'Explored overseas Channels supply-side growth; gave a phased no-go via consumption / supply / posting-penetration ceiling sizing.',
+  exp2_co:'ByteDance<br>TikTok', exp2_head:'Viral Ops × Creator Growth',
+  exp2_li1:'Built trend-signal capture and weekly review; unified leaderboard and inspiration inputs, produced a production calendar—high-grade viral template level +32% QoQ.',
+  exp2_li2:'Reached ~40k advanced creators; precipitated a private-domain core creator group of 200–300.',
+  exp2_li3:'Designed differentiated incentives by head/mid/tail; tail-creator churn relative decrease of 68%.',
+  exp2_li4:'Designed version tiering and upgrade incentives—upgrade rate +38%, template exposure +22% MoM.',
+  exp3_co:'ByteDance<br>TikTok', exp3_head:'GenAI Evaluation × Copilot Optimization',
+  exp3_li1:'Built the GenAI review sample pool and error-label system from scratch—review pass rate 35% → 94%.',
+  exp3_li2:'Iterated Copilot instructions and eval set—adoption rate doubled from 11% to 23%.',
+  exp3_li3:'Set a biweekly iteration/verification standard and A/B replay metrics, forming a reusable benchmark four-piece kit.',
+  exp4_co2:'', exp4_head:'KOC Full-Chain Operations',
+  exp4_li1:'Designed content-type and sales-type KOC task packs; ran 8 campaigns, single-campaign GMV +700% vs. same-period pre-campaign baseline.',
+  exp4_li2:'Wrote 80+ incentive articles; monitored and optimized KOC incentive rules.',
+  exp4_li3:'Built and iterated Xiaohongshuops SOPs from scratch; surfaced and drove 3 T0-level product requirements.',
+  exp5_co:'Mango TV', exp5_head:'Variety-Show Marketing Support',
+  exp5_li1:'Produced the marketing handbook and first sponsorship deck from scratch.',
+  exp5_li2:'Combined data and in-depth interviews into a 2,000+ word user persona and competitive analysis report.',
+  exp6_head:'Community Content Operations',
+  exp6_li1:'Ran comment-section activities; used content assets and fixed columns to carry post-activity revisits.',
+  exp6_li2:'Wrote 10+ game post scripts—100k+ total clicks, engagement ≥ 0.5%.',
+  exp6_li3:'Structurally collected 20+ product feedback items and drove 100% issue iteration.',
+  // skills
+  sk_data:'Data Analysis', sk_genai:'GenAI Products', sk_growth:'Growth Ops',
+  sk_content:'Content Ops', sk_safety:'Trust & Safety', sk_prod:'Product Support', sk_lang:'Language / Education',
+  // about
+  about_badge:'Product Operations<br>2022 — Present',
+  about_h:'Turn Fuzzy Problems<br>into Mechanisms',
+  about_p1:'I\'m Brian Yan, a product operator working across trust & safety, GenAI, e-commerce and content ecosystems. My consistently reusable ability is to <span class="ac">spot the key conflict, build an executable mechanism, and use data to decide whether to scale, adjust or stop</span>. I have full hands-on experience across leading platforms like WeChat Channels, TikTok, Farfetch and Mango TV.',
+  about_p2:'I believe the best operations "understand users and read data" at once—using A/B tests to validate intuition, funnel analysis to find drop-offs, and SOPs to make success repeatable, while always labeling every number with its denominator, time window and how far it can support a claim. I currently own the perceivable post-complaint governance loop and overseas opportunity calls at WeChat Channels, while pursuing a Digital Media master\'s at Uppsala University, Sweden.',
+  about_p3:'Xiaohongshu career content #1 nationwide in March & June ·500+ private-domain users · Xiaoyuzhou (podcast) deep-talk host',
+  about_edu1:'Uppsala University · MSc Digital Media (full scholarship, 2024 — 2026.12)',
+  about_edu2:'NTU exchange · full-load high marks 3A+/3A/A- · University of Cambridge visiting study',
+  about_edu3:'Wuhan Polytechnic University · Advertising, GPA top 5% of cohort',
+  about_edu4:'Published two journal papers (CPCI national-level)',
+  // contact
+  contact_sub:'Open to Product Operations / User Growth / Market Opportunity roles—feel free to reach out! WeChat = phone number.',
+  contact_podcast:'Xiaoyuzhou Podcast', contact_xhs:'Xiaohongshu',
+};
+
+/* ---------- 应用语言 ---------- */
+function applyLang(lang, animate){
+  LANG = lang;
+  try { localStorage.setItem('portfolio_lang', lang); } catch(e){}
+  document.documentElement.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+  // 切换所有 data-i18n 静态文本
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (lang === 'en') {
+      if (key in I18N) {
+        if (!el.dataset.zh) el.dataset.zh = el.innerHTML; // 备份中文
+        el.innerHTML = I18N[key];
+      }
+    } else {
+      if (el.dataset.zh !== undefined) el.innerHTML = el.dataset.zh;
+    }
+  });
+
+  // Hero 名字特殊处理
+  const heroName = document.getElementById('heroName');
+  if (heroName) {
+    if (lang === 'en') {
+      if (!heroName.dataset.zh) heroName.dataset.zh = heroName.innerHTML;
+      heroName.innerHTML = '<span class="char">B</span><span class="char">R</span><span class="char">I</span><span class="char">A</span><span class="char">N</span><br><span class="char ac">Y</span><span class="char ac">A</span><span class="char ac">N</span>';
+    } else if (heroName.dataset.zh) {
+      heroName.innerHTML = heroName.dataset.zh;
+    }
+  }
+
+  // ticker 文案随语言（英文本身通用，这里保持不变）
+
+  // 语言开关高亮
+  document.querySelectorAll('#langToggle .lang-opt').forEach(o => {
+    o.classList.toggle('active', o.dataset.lang === lang);
+  });
+
+  // 若抽屉正开着，用新语言重渲染
+  if (currentDetailKey && drawer.getAttribute('aria-hidden') === 'false') {
+    const key = currentDetailKey;
+    const d = (DETAILS[LANG] && DETAILS[LANG][key]) || DETAILS.zh[key];
+    dEye.innerHTML = `<span class="dcat pcat ${d.catClass}" style="color:${
+      d.catClass==='b'?'var(--blue)':d.catClass==='r'?'var(--acid2)':d.catClass==='p'?'var(--pink)':'var(--acid)'
+    }">${d.cat}</span><span>${d.year}</span>`;
+    dTitle.textContent = d.title;
+    const tagRow = d.tags ? `<div class="d-block"><div class="d-h">${LANG==='en'?'Capability Tags':'能力标签'}</div><div class="d-tagrow">${
+      d.tags.map(t=>`<span class="d-tag">${t}</span>`).join('')
+    }</div></div>` : '';
+    dScroll.innerHTML = `<div class="d-lede">${d.lede}</div>` + d.blocks.map(buildBlock).join('') + tagRow;
+    // 重渲染后 d-anim 需可见
+    gsap.set('.d-anim', { autoAlpha: 1, y: 0 });
+  }
+}
+
+/* 语言开关点击（在中英之间切换） */
+document.getElementById('langToggle').addEventListener('click', () => {
+  applyLang(LANG === 'en' ? 'zh' : 'en', true);
+});
+
+/* 初始应用（若本地存储为 en 则直接切） */
+if (LANG === 'en') applyLang('en', false);
+else {
+  document.querySelectorAll('#langToggle .lang-opt').forEach(o => {
+    o.classList.toggle('active', o.dataset.lang === 'zh');
+  });
+}
 </script>
 </body>
 </html>
