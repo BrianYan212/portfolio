@@ -575,6 +575,284 @@ footer span {
 }
 .d-anim { opacity: 0; } /* GSAP will reveal */
 
+/* ============ NAV：经历下拉（工作 / 旅行） ============ */
+.nav-dd { position: relative; }
+.nav-dd-trigger { display: inline-flex; align-items: center; gap: 0.35rem; }
+.nav-dd .caret { font-size: 0.5rem; display: inline-block; transition: transform 0.2s; }
+.nav-dd.open .caret { transform: rotate(180deg); }
+.nav-dd.open .nav-dd-trigger { opacity: 1; color: var(--acid); }
+.nav-menu {
+  position: absolute; top: calc(100% + 0.9rem); left: 50%;
+  transform: translate(-50%, -6px);
+  min-width: 232px; padding: 0.35rem;
+  background: #0c0c0c; border: 1px solid rgba(200,255,0,0.35);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  z-index: 120;
+}
+.nav-menu::before { content: ''; position: absolute; left: 0; right: 0; top: -1rem; height: 1rem; }
+.nav-dd.open .nav-menu { opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); }
+.nav-menu button {
+  width: 100%; display: flex; align-items: center; gap: 0.8rem; text-align: left;
+  background: transparent; border: 0; color: var(--white);
+  padding: 0.75rem 0.8rem; transition: background 0.15s, color 0.15s;
+}
+.nav-menu button:hover, .nav-menu button:focus-visible { background: var(--acid); color: var(--black); outline: none; }
+.nav-menu .mi-ic {
+  width: 24px; height: 24px; flex-shrink: 0; border: 1px solid currentColor;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Space Mono', monospace; font-size: 0.7rem;
+}
+.nav-menu .mi-t { display: flex; flex-direction: column; gap: 0.25rem; }
+.nav-menu .mi-h {
+  font-family: 'Space Mono', monospace; font-size: 0.66rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.nav-menu .mi-s { font-size: 0.68rem; opacity: 0.6; font-weight: 300; }
+
+/* ============ EXPERIENCE：工作 / 旅行 切换 ============ */
+.exp-tabs { display: flex; align-self: center; border: 1px solid rgba(255,255,255,0.14); flex-shrink: 0; }
+.exp-tab {
+  font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 0.1em;
+  text-transform: uppercase; white-space: nowrap;
+  background: transparent; color: var(--lgray); border: 0;
+  padding: 0.6rem 1rem; display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.exp-tab.active { background: var(--acid); color: var(--black); }
+.exp-tab:not(.active):hover { color: var(--acid); }
+.exp-tab .tt-badge { font-size: 0.55rem; border: 1px solid currentColor; padding: 0 0.3rem; }
+
+/* ============ 旅行足迹 半开屏（自绘 SVG 地图） ============ */
+.travel-drawer { height: 88vh; max-height: 88vh; }
+.travel-drawer .drawer-top { padding-bottom: 1.2rem; }
+.travel-body {
+  flex: 1; min-height: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) 380px;
+}
+.travel-mapwrap {
+  position: relative; min-height: 0; overflow: hidden; background: #0a0d10;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+@media (pointer: fine) { .travel-mapwrap, .travel-mapwrap * { cursor: none !important; } }
+.tmap { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tm-grat { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.tm-land { fill: #1d2228; }
+.tm-c {
+  fill: #c8ff00; fill-opacity: 0.6;
+  stroke: #0a0d10; stroke-width: 0.8; stroke-linejoin: round; vector-effect: non-scaling-stroke;
+  transition: fill-opacity 0.35s, stroke 0.35s;
+}
+.tm-c.lit-in { animation: tmLit 0.9s ease-out both; animation-delay: var(--d, 0s); }
+@keyframes tmLit { from { fill-opacity: 0; } }
+.tm-c:hover, .tm-c.hl { fill-opacity: 0.95; }
+.mode-country .tm-c, .mode-region .tm-c { fill-opacity: 0.13; }
+.mode-country .tm-c:hover, .mode-region .tm-c:hover, .mode-country .tm-c.hl { fill-opacity: 0.32; }
+.mode-country .tm-c.on, .mode-region .tm-c.on { fill-opacity: 0.2; stroke: rgba(200,255,0,0.85); stroke-width: 1.3; }
+/* 南海十段线（按国界样式表示） */
+.tm-jd { fill: none; stroke: rgba(225,230,236,0.6); stroke-width: 1.5; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.tm-hit { fill: transparent; pointer-events: none; }
+.mode-country.cn .tm-hit { pointer-events: all; }
+.tmap.moving path { shape-rendering: optimizeSpeed; }
+
+.tm-pins { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.tm-back {
+  position: absolute; top: 1rem; left: 1rem; z-index: 5;
+  font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase;
+  background: rgba(10,10,10,0.88); color: var(--acid); border: 1px solid var(--acid);
+  padding: 0.55rem 0.9rem; display: inline-flex; gap: 0.5rem; align-items: center;
+  opacity: 0; pointer-events: none; transform: translateY(-6px);
+  transition: opacity 0.25s, transform 0.25s, background 0.2s, color 0.2s;
+}
+.tm-back:hover { background: var(--acid); color: var(--black); }
+.mode-country .tm-back, .mode-region .tm-back { opacity: 1; pointer-events: auto; transform: none; }
+.tm-zoom {
+  position: absolute; right: 1rem; bottom: 1rem; z-index: 5;
+  display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.18); background: rgba(10,10,10,0.85);
+}
+.tm-zoom button {
+  width: 34px; height: 34px; background: transparent; border: 0; color: var(--white);
+  font-family: 'Space Mono', monospace; font-size: 1rem; line-height: 1; transition: background 0.2s, color 0.2s;
+}
+.tm-zoom button + button { border-top: 1px solid rgba(255,255,255,0.12); }
+.tm-zoom button:hover { background: var(--acid); color: var(--black); }
+.tm-hint {
+  position: absolute; left: 50%; bottom: 1.2rem; transform: translateX(-50%); z-index: 4;
+  font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.06em;
+  color: var(--white); background: rgba(10,10,10,0.82); border: 1px solid rgba(200,255,0,0.35);
+  padding: 0.5rem 0.9rem; white-space: nowrap; pointer-events: none; transition: opacity 0.3s;
+}
+.tm-hint b { color: var(--acid); font-weight: 400; }
+.mode-country .tm-hint, .mode-region .tm-hint { opacity: 0; }
+.tm-src {
+  position: absolute; left: 0.8rem; bottom: 0.55rem; z-index: 3; pointer-events: none;
+  font-family: 'Space Mono', monospace; font-size: 0.5rem; letter-spacing: 0.04em; color: rgba(255,255,255,0.32);
+}
+.tm-tip {
+  position: absolute; left: 0; top: 0; z-index: 6; pointer-events: none;
+  font-size: 0.74rem; font-weight: 700; color: var(--black); background: var(--acid);
+  padding: 0.3rem 0.6rem; white-space: nowrap; opacity: 0; transition: opacity 0.15s;
+}
+.tm-tip .s { font-family: 'Space Mono', monospace; font-size: 0.58rem; font-weight: 400; margin-left: 0.4rem; opacity: 0.7; }
+.tm-tip.show { opacity: 1; }
+.tm-loading {
+  position: absolute; inset: 0; z-index: 7; background: #0a0d10;
+  display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+  font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 0.16em; color: var(--acid);
+  transition: opacity 0.5s;
+}
+.tm-loading.hide { opacity: 0; pointer-events: none; }
+.tm-spin {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid rgba(200,255,0,0.2); border-top-color: var(--acid);
+  animation: tmSpin 0.8s linear infinite;
+}
+@keyframes tmSpin { to { transform: rotate(360deg); } }
+
+/* 地图光点 / 标签（HTML 叠加层，.gm 是零尺寸锚点，位置随视图更新） */
+.gm { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 2; }
+.gm.off { display: none !important; }
+.gm-btn {
+  position: absolute; left: 0; top: 0; width: 0; height: 0; padding: 0; border: 0; background: none;
+  pointer-events: auto; color: inherit; font: inherit;
+}
+.gm-zone { position: absolute; left: -13px; top: -13px; width: 26px; height: 26px; border-radius: 50%; }
+.gm-core, .gm-ring {
+  position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; pointer-events: none;
+}
+.gm-core {
+  background: var(--acid);
+  box-shadow: 0 0 0 2px rgba(10,10,10,0.85), 0 0 14px 4px rgba(200,255,0,0.55);
+  transition: transform 0.2s;
+}
+.gm-ring { border: 1.5px solid var(--acid); animation: gmPulse 2.6s ease-out infinite; animation-delay: var(--pd, 0s); }
+@keyframes gmPulse { 0% { transform: scale(1); opacity: 0.85; } 100% { transform: scale(3.4); opacity: 0; } }
+.gm-lb {
+  position: absolute; left: 12px; top: 0; transform: translateY(-50%);
+  white-space: nowrap; pointer-events: none;
+  font-family: 'Noto Sans SC', 'PingFang SC', sans-serif; font-size: 0.72rem; font-weight: 700; line-height: 1.35;
+  color: var(--white); background: rgba(10,10,10,0.86);
+  border: 1px solid rgba(200,255,0,0.45); padding: 0.12rem 0.45rem;
+  transition: opacity 0.2s;
+}
+.gm.lb-l .gm-lb { left: auto; right: 12px; }
+.gm.lb-t .gm-lb { left: 0; top: auto; bottom: 9px; transform: translateX(-50%); }
+.gm.lb-b .gm-lb { left: 0; top: 9px; transform: translateX(-50%); }
+.gm.nolb .gm-lb, .gm-tiny .gm-lb { opacity: 0; }
+.gm:hover, .gm.hl { z-index: 4; }
+.gm:hover .gm-lb, .gm.hl .gm-lb { opacity: 1; }
+.gm:hover .gm-core, .gm.hl .gm-core { transform: scale(1.5); }
+.gm.hl .gm-lb { background: var(--acid); color: var(--black); }
+.gm.pre { opacity: 0; }
+.gm.pop .gm-zone, .gm.pop .gm-core, .gm.pop .gm-badge { animation: gmLight 0.65s cubic-bezier(.2,1.5,.4,1) both; animation-delay: var(--d, 0s); }
+.gm.pop .gm-ring { animation: gmLight 0.65s cubic-bezier(.2,1.5,.4,1) both, gmPulse 2.6s ease-out 1s infinite; animation-delay: var(--d, 0s), var(--pd, 1s); }
+/* 标签淡入只定义起点、不填充终点，避让隐藏（.nolb）不会被动画覆盖 */
+.gm.pop .gm-lb { animation: lbIn 0.45s ease backwards; animation-delay: calc(var(--d, 0s) + 0.2s); }
+@keyframes gmLight { 0% { opacity: 0; scale: 0; } 100% { opacity: 1; scale: 1; } }
+@keyframes lbIn { from { opacity: 0; } }
+.gm.muted .gm-core { left: -3px; top: -3px; width: 6px; height: 6px; box-shadow: 0 0 6px 1px rgba(200,255,0,0.5); }
+.gm.muted .gm-ring, .gm.muted .gm-lb, .gm.muted .gm-zone { display: none; }
+.gm.muted .gm-btn { pointer-events: none; }
+.gm-badge {
+  position: absolute; left: 12px; top: -13px; white-space: nowrap;
+  font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.06em;
+  color: var(--acid); background: rgba(10,10,10,0.9); border: 1px solid var(--acid);
+  padding: 0.3rem 0.55rem; transition: background 0.2s, color 0.2s;
+}
+.gm-badge b { font-family: 'Bebas Neue', Impact, sans-serif; font-weight: 400; font-size: 0.95rem; margin: 0 0.15rem 0 0.25rem; vertical-align: -1px; }
+.gm-cluster:hover .gm-badge, .gm-cluster.hl .gm-badge { background: var(--acid); color: var(--black); }
+
+/* 右侧面板 */
+.travel-panel {
+  min-height: 0; overflow-y: auto; padding: 1.6rem 1.8rem 3rem;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  scrollbar-width: thin; scrollbar-color: rgba(200,255,0,0.4) transparent;
+}
+.tp-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,0.07); margin-bottom: 1.3rem; }
+.tp-stat { background: #0c0c0c; padding: 0.9rem 0.9rem 0.8rem; }
+.tp-stat b {
+  display: block; font-family: 'Bebas Neue', Impact, sans-serif; font-weight: 400;
+  font-size: 2.4rem; line-height: 1; color: var(--acid);
+}
+.tp-stat span {
+  font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.08em;
+  color: var(--gray); text-transform: uppercase;
+}
+.tp-hint {
+  font-size: 0.8rem; line-height: 1.65; color: var(--lgray); font-weight: 300;
+  margin-bottom: 1.6rem; padding-left: 0.9rem; border-left: 2px solid var(--acid);
+}
+.tp-group { margin-bottom: 1.5rem; }
+.tp-gh {
+  font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--acid);
+  display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.8rem;
+}
+.tp-gh::before { content: ''; width: 18px; height: 1px; background: var(--acid); }
+.tp-gh .n { color: var(--gray); }
+button.tp-gh {
+  background: transparent; border: 0; padding: 0; width: 100%; text-align: left; transition: color 0.2s;
+}
+button.tp-gh .go { margin-left: auto; border: 1px solid currentColor; padding: 0.1rem 0.4rem; font-size: 0.56rem; }
+button.tp-gh:hover { color: var(--white); }
+.tp-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tp-chip {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12);
+  color: var(--white); padding: 0.4rem 0.55rem;
+  font-family: inherit; font-size: 0.78rem; transition: border-color 0.18s, background 0.18s;
+}
+.tp-chip:hover, .tp-chip:focus-visible { border-color: var(--acid); background: rgba(200,255,0,0.08); outline: none; }
+.tp-chip .fl { font-size: 0.95rem; line-height: 1; }
+.tp-chip .ct {
+  font-family: 'Space Mono', monospace; font-size: 0.55rem;
+  color: var(--black); background: var(--acid); padding: 0.05rem 0.3rem;
+}
+.tp-back {
+  font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+  background: transparent; color: var(--acid); border: 1px solid rgba(200,255,0,0.45);
+  padding: 0.45rem 0.8rem; transition: background 0.2s, color 0.2s;
+}
+.tp-back:hover { background: var(--acid); color: var(--black); }
+.tp-country { display: flex; align-items: center; gap: 1rem; margin: 1.4rem 0 0.2rem; }
+.tp-flag { font-size: 2.6rem; line-height: 1; }
+.tp-cname { font-size: 1.7rem; font-weight: 900; line-height: 1.1; }
+.tp-cen { font-family: 'Bebas Neue', Impact, sans-serif; font-size: 1.1rem; letter-spacing: 0.08em; color: var(--gray); }
+.tp-lit {
+  font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--acid); margin: 1.2rem 0 1rem;
+}
+.tp-empty {
+  border: 1px dashed rgba(255,255,255,0.18); padding: 1.2rem; font-size: 0.8rem; line-height: 1.6;
+  color: var(--gray); font-weight: 300;
+}
+.tp-cities { list-style: none; display: flex; flex-direction: column; gap: 1px; background: rgba(255,255,255,0.06); margin-bottom: 1.4rem; }
+.tp-cities button {
+  width: 100%; display: grid; grid-template-columns: 14px 1fr; column-gap: 0.8rem; align-items: center;
+  text-align: left; background: #0c0c0c; border: 0; color: var(--white);
+  padding: 0.75rem 1rem; font-family: inherit;
+  transition: background 0.18s;
+  animation: tpIn 0.5s ease both; animation-delay: var(--d, 0s);
+}
+.tp-cities button:hover, .tp-cities button.hl { background: rgba(200,255,0,0.08); }
+.tp-cities .cdot {
+  grid-row: span 2; justify-self: center;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--acid); box-shadow: 0 0 10px rgba(200,255,0,0.7);
+}
+.tp-cities .cn { font-size: 0.9rem; font-weight: 700; }
+.tp-cities .cnote {
+  grid-column: 2; margin-top: 0.2rem;
+  font-family: 'Space Mono', monospace; font-size: 0.58rem; color: var(--gray); letter-spacing: 0.03em;
+}
+@keyframes tpIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+
+/* 地图数据加载失败时的降级：面板铺满 */
+.travel-drawer.no-map .travel-body { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+.travel-drawer.no-map .travel-mapwrap { display: none; }
+.travel-drawer.no-map .travel-panel { border-left: 0; padding: 2rem 3rem 3rem; }
+
 /* REVEAL fallback (no-JS / reduced motion) */
 .rv { opacity: 0; transform: translateY(28px); }
 .no-anim .rv, .rv.in { opacity: 1; transform: none; }
@@ -605,6 +883,17 @@ footer span {
   .d-step::after { display: none; }
   .d-cols { grid-template-columns: 1fr; }
   .d-metric { min-width: 45%; }
+  /* travel mobile */
+  #exp .sec-head { flex-wrap: wrap; row-gap: 1.2rem; }
+  .exp-tabs { order: 4; width: 100%; }
+  .exp-tab { flex: 1; justify-content: center; }
+  .travel-drawer { height: 92vh; max-height: 92vh; }
+  .travel-body { grid-template-columns: 1fr; grid-template-rows: 52% 1fr; }
+  .travel-panel { border-left: 0; border-top: 1px solid rgba(255,255,255,0.08); padding: 1.2rem 1.4rem 2.5rem; }
+  .travel-drawer.no-map .travel-panel { padding: 1.4rem 1.4rem 2.5rem; }
+  .tm-hint { display: none; }
+  .tm-zoom { right: 0.6rem; bottom: 0.6rem; }
+  .tp-country { margin-top: 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -623,7 +912,19 @@ footer span {
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="#work" data-i18n="nav_work">作品</a></li>
-      <li><a href="#exp" data-i18n="nav_exp">经历</a></li>
+      <li class="nav-dd" id="navExpDD">
+        <a href="#exp" class="nav-dd-trigger" aria-haspopup="true" aria-expanded="false"><span data-i18n="nav_exp">经历</span><span class="caret">▼</span></a>
+        <div class="nav-menu" role="menu">
+          <button type="button" role="menuitem" data-go="work">
+            <span class="mi-ic">01</span>
+            <span class="mi-t"><span class="mi-h" data-i18n="dd_work">工作经历</span><span class="mi-s" data-i18n="dd_work_s">实习与全职 · 6 段</span></span>
+          </button>
+          <button type="button" role="menuitem" data-go="travel">
+            <span class="mi-ic">✈&#xFE0E;</span>
+            <span class="mi-t"><span class="mi-h" data-i18n="dd_travel">旅行经历</span><span class="mi-s" data-i18n="dd_travel_s"><span class="js-ncountry">30</span> 个国家 · 足迹地图</span></span>
+          </button>
+        </div>
+      </li>
       <li><a href="#about" data-i18n="nav_about">关于</a></li>
       <li><a href="#contact" data-i18n="nav_contact">联系</a></li>
     </ul>
@@ -795,6 +1096,10 @@ footer span {
     <span class="sec-num">02</span>
     <h2 class="sec-title">EXPERIENCE</h2>
     <div class="sec-line"></div>
+    <div class="exp-tabs">
+      <button type="button" class="exp-tab active" data-i18n="exp_tab_work">工作经历</button>
+      <button type="button" class="exp-tab" id="expTravelTab"><span data-i18n="exp_tab_travel">旅行经历</span><span class="tt-badge js-ncountry">30</span>↗</button>
+    </div>
   </div>
   <div>
     <div class="exp-item rv">
@@ -1023,6 +1328,32 @@ footer span {
     <button class="drawer-close" id="drawerClose" aria-label="关闭">✕</button>
   </div>
   <div class="drawer-scroll" id="drawerScroll"></div>
+</div>
+
+<!-- ============ 旅行足迹 半开屏（自绘 SVG 世界地图，国家涂色点亮） ============ -->
+<div class="drawer-overlay" id="travelOverlay"></div>
+<div class="drawer travel-drawer" id="travelDrawer" role="dialog" aria-modal="true" aria-labelledby="travelTitle" aria-hidden="true">
+  <div class="drawer-grip" id="travelGrip"><span></span></div>
+  <div class="drawer-top">
+    <div>
+      <div class="drawer-eyebrow"><span class="dcat">Travel Log</span><span id="travelCrumb">WORLD</span></div>
+      <div class="drawer-title" id="travelTitle">足迹地图</div>
+    </div>
+    <button class="drawer-close" id="travelClose" aria-label="关闭">✕</button>
+  </div>
+  <div class="travel-body">
+    <div class="travel-mapwrap mode-world" id="travelMapWrap">
+      <svg class="tmap" id="tmapSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      <div class="tm-pins" id="tmPins"></div>
+      <div class="tm-tip" id="tmTip"></div>
+      <button class="tm-back" id="tmBack" type="button">← <span id="tmBackTxt">世界地图</span></button>
+      <div class="tm-zoom"><button type="button" id="tmZoomIn" aria-label="放大">+</button><button type="button" id="tmZoomOut" aria-label="缩小">−</button></div>
+      <div class="tm-hint" id="tmHint"></div>
+      <div class="tm-src" id="tmSrc">示意图 · Natural Earth / DataV.GeoAtlas</div>
+      <div class="tm-loading" id="tmLoading"><span class="tm-spin"></span>LOADING MAP</div>
+    </div>
+    <aside class="travel-panel" id="travelPanel"></aside>
+  </div>
 </div>
 
 <!-- GSAP -->
@@ -1652,11 +1983,939 @@ overlay.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
 /* ============================================================
+   旅行足迹：半开屏 + 自绘 SVG 世界地图（国家涂色点亮 → 点国家放大 → 点亮城市）
+   - 地图数据 travel-map.json（打开抽屉时才加载）：Natural Earth（公有领域）+ DataV.GeoAtlas 中国边界与南海十段线
+   - 按中国标准处理：中国含台湾、港澳、藏南、阿克赛钦、南海诸岛、钓鱼岛及赤尾屿
+   - 只单独绘制去过的国家，其余陆地合成一整块、不画国界线，避开争议边界
+   - 不依赖任何地图服务 / key，可直接部署在 GitHub Pages
+   ============================================================ */
+// 足迹数据 —— 增删国家 / 城市只改这里（坐标 WGS84：lat 纬度, lng 经度）
+// b: 放大时的视野范围 [[南纬, 西经], [北纬, 东经]]；tiny: 小国在世界视图额外显示的光点 [lat, lng]
+// rg: 'TW' = 台湾地区（中国视图里折叠成一组，点开再展开）；sar: 港澳；note: 备注（中 / 英，可选）
+const TRAVEL = [
+  { id:'CN', f:'🐉', zh:'中国', en:'China', ct:'as', b:[[3.4,73.5],[53.6,135.1]],
+    regions: [
+      { id:'TW', zh:'台湾地区', en:'Taiwan, China', b:[[21.75,118.05],[25.45,122.2]], hit:[[21.85,119.25],[25.35,122.05]], at:[23.75,121.05] },
+    ],
+    cities:[
+      { zh:'广州', en:'Guangzhou', lat:23.129, lng:113.264, note:{ zh:'微信视频号 · 工作', en:'Working at WeChat Channels' } },
+      { zh:'上海', en:'Shanghai', lat:31.230, lng:121.474, note:{ zh:'TikTok · Farfetch 实习', en:'Interned at TikTok · Farfetch' } },
+      { zh:'北京', en:'Beijing', lat:39.904, lng:116.407 },
+      { zh:'深圳', en:'Shenzhen', lat:22.543, lng:114.058, note:{ zh:'R2Games 实习', en:'Interned at R2Games' } },
+      { zh:'武汉', en:'Wuhan', lat:30.593, lng:114.305 },
+      { zh:'成都', en:'Chengdu', lat:30.573, lng:104.066 },
+      { zh:'重庆', en:'Chongqing', lat:29.563, lng:106.551 },
+      { zh:'西安', en:"Xi'an", lat:34.341, lng:108.940 },
+      { zh:'杭州', en:'Hangzhou', lat:30.274, lng:120.155 },
+      { zh:'天津', en:'Tianjin', lat:39.084, lng:117.201 },
+      { zh:'沈阳', en:'Shenyang', lat:41.806, lng:123.432 },
+      { zh:'长沙', en:'Changsha', lat:28.228, lng:112.939, note:{ zh:'芒果TV 实习', en:'Interned at Mango TV' } },
+      { zh:'南京', en:'Nanjing', lat:32.060, lng:118.797 },
+      { zh:'哈尔滨', en:'Harbin', lat:45.803, lng:126.535 },
+      { zh:'兰州', en:'Lanzhou', lat:36.061, lng:103.834 },
+      { zh:'西宁', en:'Xining', lat:36.617, lng:101.778 },
+      { zh:'漠河', en:'Mohe', lat:52.972, lng:122.538 },
+      { zh:'大连', en:'Dalian', lat:38.914, lng:121.615 },
+      { zh:'郑州', en:'Zhengzhou', lat:34.747, lng:113.625 },
+      { zh:'洛阳', en:'Luoyang', lat:34.620, lng:112.454 },
+      { zh:'大同', en:'Datong', lat:40.077, lng:113.300 },
+      { zh:'乌兰察布', en:'Ulanqab', lat:40.994, lng:113.133 },
+      { zh:'遵义', en:'Zunyi', lat:27.725, lng:106.927 },
+      { zh:'湛江', en:'Zhanjiang', lat:21.271, lng:110.359 },
+      { zh:'温州', en:'Wenzhou', lat:27.994, lng:120.699 },
+      { zh:'苏州', en:'Suzhou', lat:31.299, lng:120.585 },
+      { zh:'无锡', en:'Wuxi', lat:31.491, lng:120.312 },
+      { zh:'扬州', en:'Yangzhou', lat:32.394, lng:119.413 },
+      { zh:'大庆', en:'Daqing', lat:46.589, lng:125.104 },
+      { zh:'广汉', en:'Guanghan', lat:30.977, lng:104.282 },
+      { zh:'济南', en:'Jinan', lat:36.651, lng:117.120 },
+      { zh:'太原', en:'Taiyuan', lat:37.870, lng:112.549 },
+      { zh:'南昌', en:'Nanchang', lat:28.682, lng:115.858 },
+      { zh:'贵阳', en:'Guiyang', lat:26.647, lng:106.630 },
+      { zh:'桂林', en:'Guilin', lat:25.274, lng:110.290 },
+      { zh:'柳州', en:'Liuzhou', lat:24.326, lng:109.428 },
+      { zh:'凯里', en:'Kaili', lat:26.566, lng:107.981 },
+      { zh:'恩施', en:'Enshi', lat:30.272, lng:109.488 },
+      { zh:'咸宁', en:'Xianning', lat:29.841, lng:114.322 },
+      { zh:'潮州', en:'Chaozhou', lat:23.657, lng:116.622 },
+      { zh:'汕头', en:'Shantou', lat:23.354, lng:116.682 },
+      { zh:'东莞', en:'Dongguan', lat:23.021, lng:113.752 },
+      { zh:'佛山', en:'Foshan', lat:23.022, lng:113.122 },
+      { zh:'江门', en:'Jiangmen', lat:22.579, lng:113.082 },
+      { zh:'中国香港', en:'Hong Kong, China', lat:22.320, lng:114.169, sar:true },
+      { zh:'中国澳门', en:'Macao, China', lat:22.199, lng:113.544, sar:true },
+      { zh:'台北', en:'Taipei', lat:25.033, lng:121.565, rg:'TW', note:{ zh:'台湾大学交换', en:'Exchange · National Taiwan University' } },
+      { zh:'台中', en:'Taichung', lat:24.148, lng:120.674, rg:'TW' },
+      { zh:'台南', en:'Tainan', lat:22.999, lng:120.227, rg:'TW' },
+      { zh:'花莲', en:'Hualien', lat:23.977, lng:121.604, rg:'TW' },
+      { zh:'垦丁', en:'Kenting', lat:21.946, lng:120.797, rg:'TW' },
+      { zh:'台东', en:'Taitung', lat:22.756, lng:121.144, rg:'TW' },
+      { zh:'基隆', en:'Keelung', lat:25.128, lng:121.739, rg:'TW' },
+      { zh:'宜兰', en:'Yilan', lat:24.757, lng:121.753, rg:'TW' },
+      { zh:'罗东', en:'Luodong', lat:24.677, lng:121.767, rg:'TW' },
+      { zh:'嘉义', en:'Chiayi', lat:23.480, lng:120.449, rg:'TW' },
+      { zh:'苗栗', en:'Miaoli', lat:24.560, lng:120.821, rg:'TW' },
+      { zh:'绿岛', en:'Green Island', lat:22.662, lng:121.490, rg:'TW' },
+      { zh:'金门', en:'Kinmen', lat:24.437, lng:118.318, rg:'TW' },
+    ] },
+  { id:'JP', f:'🇯🇵', zh:'日本', en:'Japan', ct:'as', b:[[30.9,129.4],[45.6,145.9]],
+    cities:[
+      { zh:'东京', en:'Tokyo', lat:35.676, lng:139.650 },
+      { zh:'大阪', en:'Osaka', lat:34.694, lng:135.502 },
+      { zh:'京都', en:'Kyoto', lat:35.012, lng:135.768 },
+      { zh:'札幌', en:'Sapporo', lat:43.062, lng:141.354, note:{ zh:'2026.09', en:'Sep 2026' } },
+      { zh:'福冈', en:'Fukuoka', lat:33.590, lng:130.402 },
+      { zh:'名古屋', en:'Nagoya', lat:35.181, lng:136.906 },
+      { zh:'仙台', en:'Sendai', lat:38.268, lng:140.869, note:{ zh:'2026.09', en:'Sep 2026' } },
+      { zh:'鹿儿岛', en:'Kagoshima', lat:31.597, lng:130.557 },
+      { zh:'旭川', en:'Asahikawa', lat:43.771, lng:142.365, note:{ zh:'2026.09', en:'Sep 2026' } },
+      { zh:'熊本', en:'Kumamoto', lat:32.803, lng:130.708 },
+      { zh:'神户', en:'Kobe', lat:34.690, lng:135.196 },
+      { zh:'横滨', en:'Yokohama', lat:35.444, lng:139.638 },
+      { zh:'富士山', en:'Mt. Fuji', lat:35.361, lng:138.727 },
+      { zh:'福岛市', en:'Fukushima', lat:37.750, lng:140.468, note:{ zh:'2026.09', en:'Sep 2026' } },
+      { zh:'松岛', en:'Matsushima', lat:38.373, lng:141.067, note:{ zh:'2026.09', en:'Sep 2026' } },
+      { zh:'城崎', en:'Kinosaki', lat:35.626, lng:134.812 },
+      { zh:'丰冈', en:'Toyooka', lat:35.544, lng:134.820 },
+      { zh:'伊豆', en:'Izu', lat:34.977, lng:138.947 },
+      { zh:'镰仓', en:'Kamakura', lat:35.319, lng:139.547 },
+      { zh:'横须贺', en:'Yokosuka', lat:35.281, lng:139.672 },
+      { zh:'春日部', en:'Kasukabe', lat:35.975, lng:139.752 },
+      { zh:'有马', en:'Arima', lat:34.797, lng:135.248 },
+    ] },
+  { id:'KR', f:'🇰🇷', zh:'韩国', en:'South Korea', ct:'as', b:[[33.1,124.6],[38.65,130.95]],
+    cities:[
+      { zh:'首尔', en:'Seoul', lat:37.566, lng:126.978 },
+      { zh:'济州', en:'Jeju', lat:33.499, lng:126.531 },
+    ] },
+  { id:'VN', f:'🇻🇳', zh:'越南', en:'Vietnam', ct:'as', b:[[8.4,102.1],[23.4,109.5]],
+    cities:[{ zh:'胡志明市', en:'Ho Chi Minh City', lat:10.823, lng:106.630 }] },
+  { id:'TH', f:'🇹🇭', zh:'泰国', en:'Thailand', ct:'as', b:[[5.6,97.3],[20.47,105.64]],
+    cities:[
+      { zh:'曼谷', en:'Bangkok', lat:13.756, lng:100.502, note:{ zh:'2026.08', en:'Aug 2026' } },
+      { zh:'清迈', en:'Chiang Mai', lat:18.788, lng:98.985 },
+      { zh:'普吉岛', en:'Phuket', lat:7.880, lng:98.392 },
+    ] },
+  { id:'KH', f:'🇰🇭', zh:'柬埔寨', en:'Cambodia', ct:'as', b:[[10.4,102.3],[14.7,107.65]],
+    cities:[
+      { zh:'金边', en:'Phnom Penh', lat:11.556, lng:104.928 },
+      { zh:'暹粒', en:'Siem Reap', lat:13.367, lng:103.845 },
+    ] },
+  { id:'MY', f:'🇲🇾', zh:'马来西亚', en:'Malaysia', ct:'as', b:[[0.85,99.6],[7.4,119.3]],
+    cities:[
+      { zh:'吉隆坡', en:'Kuala Lumpur', lat:3.139, lng:101.687, note:{ zh:'2026.11', en:'Nov 2026' } },
+      { zh:'亚庇', en:'Kota Kinabalu', lat:5.980, lng:116.073 },
+      { zh:'仙本那', en:'Semporna', lat:4.481, lng:118.611 },
+    ] },
+  { id:'ID', f:'🇮🇩', zh:'印度尼西亚', en:'Indonesia', ct:'as', b:[[-11,95],[6,141]],
+    cities:[
+      { zh:'雅加达', en:'Jakarta', lat:-6.208, lng:106.846 },
+      { zh:'泗水', en:'Surabaya', lat:-7.257, lng:112.752 },
+    ] },
+  { id:'SE', f:'🇸🇪', zh:'瑞典', en:'Sweden', ct:'eu', b:[[55.33,11.1],[69.06,24.17]],
+    cities:[
+      { zh:'乌普萨拉', en:'Uppsala', lat:59.858, lng:17.639 },
+      { zh:'斯德哥尔摩', en:'Stockholm', lat:59.329, lng:18.069 },
+      { zh:'博伦厄', en:'Borlänge', lat:60.485, lng:15.437 },
+    ] },
+  { id:'FI', f:'🇫🇮', zh:'芬兰', en:'Finland', ct:'eu', b:[[59.8,20.55],[70.1,31.6]],
+    cities:[{ zh:'赫尔辛基', en:'Helsinki', lat:60.170, lng:24.938 }] },
+  { id:'EE', f:'🇪🇪', zh:'爱沙尼亚', en:'Estonia', ct:'eu', b:[[57.5,21.76],[59.7,28.2]],
+    cities:[{ zh:'塔林', en:'Tallinn', lat:59.437, lng:24.754, note:{ zh:'2026.04', en:'Apr 2026' } }] },
+  { id:'LT', f:'🇱🇹', zh:'立陶宛', en:'Lithuania', ct:'eu', b:[[53.9,20.95],[56.45,26.84]],
+    cities:[{ zh:'维尔纽斯', en:'Vilnius', lat:54.687, lng:25.280 }] },
+  { id:'PL', f:'🇵🇱', zh:'波兰', en:'Poland', ct:'eu', b:[[49.0,14.12],[54.84,24.15]],
+    cities:[
+      { zh:'格但斯克', en:'Gdańsk', lat:54.352, lng:18.646 },
+      { zh:'索波特', en:'Sopot', lat:54.441, lng:18.560 },
+      { zh:'格丁尼亚', en:'Gdynia', lat:54.519, lng:18.531 },
+      { zh:'克拉科夫', en:'Kraków', lat:50.065, lng:19.945 },
+    ] },
+  { id:'DE', f:'🇩🇪', zh:'德国', en:'Germany', ct:'eu', b:[[47.27,5.87],[55.06,15.04]],
+    cities:[{ zh:'柏林', en:'Berlin', lat:52.520, lng:13.405 }] },
+  { id:'HU', f:'🇭🇺', zh:'匈牙利', en:'Hungary', ct:'eu', b:[[45.74,16.11],[48.59,22.9]],
+    cities:[{ zh:'布达佩斯', en:'Budapest', lat:47.498, lng:19.040 }] },
+  { id:'AT', f:'🇦🇹', zh:'奥地利', en:'Austria', ct:'eu', b:[[46.37,9.53],[49.02,17.16]],
+    cities:[{ zh:'维也纳', en:'Vienna', lat:48.208, lng:16.373 }] },
+  { id:'FR', f:'🇫🇷', zh:'法国', en:'France', ct:'eu', b:[[41.3,-5.2],[51.1,9.6]],
+    cities:[
+      { zh:'巴黎', en:'Paris', lat:48.857, lng:2.352 },
+      { zh:'里昂', en:'Lyon', lat:45.764, lng:4.836 },
+    ] },
+  { id:'ES', f:'🇪🇸', zh:'西班牙', en:'Spain', ct:'eu', b:[[35.95,-9.4],[43.8,4.35]],
+    cities:[{ zh:'巴塞罗那', en:'Barcelona', lat:41.385, lng:2.173 }] },
+  { id:'PT', f:'🇵🇹', zh:'葡萄牙', en:'Portugal', ct:'eu', b:[[36.95,-9.55],[42.15,-6.19]],
+    cities:[
+      { zh:'里斯本', en:'Lisbon', lat:38.722, lng:-9.139 },
+      { zh:'辛特拉', en:'Sintra', lat:38.800, lng:-9.379 },
+    ] },
+  { id:'IT', f:'🇮🇹', zh:'意大利', en:'Italy', ct:'eu', b:[[36.6,6.6],[47.1,18.5]],
+    cities:[
+      { zh:'罗马', en:'Rome', lat:41.903, lng:12.496 },
+      { zh:'米兰', en:'Milan', lat:45.464, lng:9.190 },
+    ] },
+  { id:'VA', f:'🇻🇦', zh:'梵蒂冈', en:'Vatican City', ct:'eu', b:[[41.86,12.36],[41.95,12.56]], tiny:[41.9029,12.4534],
+    cities:[{ zh:'梵蒂冈城', en:'Vatican City', lat:41.9029, lng:12.4534 }] },
+  { id:'MT', f:'🇲🇹', zh:'马耳他', en:'Malta', ct:'eu', b:[[35.78,14.18],[36.08,14.58]], tiny:[35.92,14.42],
+    cities:[
+      { zh:'梅利哈', en:'Mellieħa', lat:35.957, lng:14.362, note:{ zh:'2026.05', en:'May 2026' } },
+      { zh:'圣朱利安斯', en:"St. Julian's", lat:35.918, lng:14.489, note:{ zh:'2026.05', en:'May 2026' } },
+    ] },
+  { id:'GR', f:'🇬🇷', zh:'希腊', en:'Greece', ct:'eu', b:[[34.8,19.37],[41.75,28.25]],
+    cities:[
+      { zh:'雅典', en:'Athens', lat:37.984, lng:23.728 },
+      { zh:'圣托里尼', en:'Santorini', lat:36.393, lng:25.461 },
+      { zh:'塞萨洛尼基', en:'Thessaloniki', lat:40.640, lng:22.944 },
+    ] },
+  { id:'AL', f:'🇦🇱', zh:'阿尔巴尼亚', en:'Albania', ct:'eu', b:[[39.6,19.2],[42.7,21.1]],
+    cities:[
+      { zh:'地拉那', en:'Tirana', lat:41.327, lng:19.819 },
+      { zh:'克鲁亚', en:'Krujë', lat:41.509, lng:19.793 },
+    ] },
+  { id:'BA', f:'🇧🇦', zh:'波黑', en:'Bosnia & Herzegovina', ct:'eu', b:[[42.55,15.72],[45.28,19.62]],
+    cities:[{ zh:'萨拉热窝', en:'Sarajevo', lat:43.856, lng:18.413 }] },
+  { id:'TR', f:'🇹🇷', zh:'土耳其', en:'Türkiye', ct:'eu', b:[[35.8,25.65],[42.11,44.82]],
+    cities:[{ zh:'伊斯坦布尔', en:'Istanbul', lat:41.008, lng:28.978 }] },
+  { id:'GB', f:'🇬🇧', zh:'英国', en:'United Kingdom', ct:'eu', b:[[49.9,-8.2],[58.7,1.8]],
+    cities:[
+      { zh:'伦敦', en:'London', lat:51.507, lng:-0.128 },
+      { zh:'剑桥', en:'Cambridge', lat:52.205, lng:0.122, note:{ zh:'剑桥大学访学', en:'Visiting student · University of Cambridge' } },
+      { zh:'爱丁堡', en:'Edinburgh', lat:55.953, lng:-3.189 },
+      { zh:'曼彻斯特', en:'Manchester', lat:53.481, lng:-2.243 },
+      { zh:'利兹', en:'Leeds', lat:53.801, lng:-1.549 },
+      { zh:'约克', en:'York', lat:53.960, lng:-1.082 },
+      { zh:'多佛白崖', en:'White Cliffs of Dover', lat:51.130, lng:1.335 },
+    ] },
+  { id:'NO', f:'🇳🇴', zh:'挪威', en:'Norway', ct:'eu', b:[[57.95,4.6],[71.2,31.1]],
+    cities:[{ zh:'特罗姆瑟', en:'Tromsø', lat:69.649, lng:18.955 }] },
+  { id:'IS', f:'🇮🇸', zh:'冰岛', en:'Iceland', ct:'eu', b:[[63.3,-24.55],[66.57,-13.49]],
+    cities:[
+      { zh:'雷克雅未克', en:'Reykjavík', lat:64.147, lng:-21.942 },
+      { zh:'赫本', en:'Höfn', lat:64.254, lng:-15.212 },
+      { zh:'维克', en:'Vík', lat:63.419, lng:-19.006 },
+      { zh:'塞尔福斯', en:'Selfoss', lat:63.933, lng:-20.997 },
+      { zh:'格伦达菲厄泽', en:'Grundarfjörður', lat:64.924, lng:-23.258 },
+      { zh:'斯蒂基斯霍尔米', en:'Stykkishólmur', lat:65.075, lng:-22.727 },
+      { zh:'教堂镇', en:'Kirkjubæjarklaustur', lat:63.789, lng:-18.055 },
+      { zh:'弗鲁济', en:'Flúðir', lat:64.135, lng:-20.312 },
+      { zh:'海拉', en:'Hella', lat:63.835, lng:-20.399 },
+    ] },
+  { id:'US', f:'🇺🇸', zh:'美国', en:'United States', ct:'na', b:[[24.4,-125.0],[49.4,-66.9]],
+    cities:[
+      { zh:'纽约', en:'New York', lat:40.713, lng:-74.006 },
+      { zh:'洛杉矶', en:'Los Angeles', lat:34.052, lng:-118.244 },
+      { zh:'拉斯维加斯', en:'Las Vegas', lat:36.170, lng:-115.140 },
+    ] },
+];
+
+const CONTINENTS = [
+  { k:'as', zh:'亚洲', en:'Asia' },
+  { k:'eu', zh:'欧洲', en:'Europe' },
+  { k:'na', zh:'北美洲', en:'North America' },
+];
+const TT = {
+  zh: {
+    title:'足迹地图', world:'WORLD', back:'世界地图', backCN:'中国',
+    backPanel:'← 返回世界', backPanelCN:'← 返回中国',
+    countries:'个国家', cities:'座城市', continents:'个大洲',
+    hint:'点亮的是我去过的国家。点地图上的国家（或下面的列表）放大，看我去过的城市。',
+    hintNoMap:'地图暂时没加载出来，点下面的国家看我去过的城市。',
+    mapHint:'点击 <b>点亮的国家</b> 放大 · 滚轮缩放 · 拖动平移',
+    mapHintTouch:'点击 <b>点亮的国家</b> 放大 · 双指缩放',
+    lit: n => `已点亮 ${n} 座城市`, tip: n => n ? `${n} 座城市` : '城市待补充',
+    empty:'这个国家的城市清单还在整理中。', mainland:'中国大陆', sar:'港澳', open:'展开',
+    close:'关闭', zin:'放大', zout:'缩小', src:'示意图 · Natural Earth / DataV.GeoAtlas',
+  },
+  en: {
+    title:"WHERE I'VE BEEN", world:'WORLD', back:'World map', backCN:'China',
+    backPanel:'← Back to world', backPanelCN:'← Back to China',
+    countries:'Countries', cities:'Cities', continents:'Continents',
+    hint:'Lit countries are the ones I have been to. Tap a country on the map (or in the list) to zoom in and see the cities.',
+    hintNoMap:'The map did not load. Tap a country below to see the cities I have been to.',
+    mapHint:'Tap a <b>lit country</b> to zoom · scroll to zoom · drag to pan',
+    mapHintTouch:'Tap a <b>lit country</b> to zoom · pinch to zoom',
+    lit: n => `${n} ${n > 1 ? 'cities' : 'city'} lit`, tip: n => n ? `${n} ${n > 1 ? 'cities' : 'city'}` : 'cities coming soon',
+    empty:'City list for this country is coming soon.', mainland:'Mainland China', sar:'Hong Kong & Macao, China', open:'Open',
+    close:'Close', zin:'Zoom in', zout:'Zoom out', src:'Schematic map · Natural Earth / DataV.GeoAtlas',
+  },
+};
+const TRAVEL_BY_ID = Object.fromEntries(TRAVEL.map(c => [c.id, c]));
+const CITY_TOTAL = TRAVEL.reduce((s, c) => s + c.cities.length, 0);
+const syncCountryCount = () => document.querySelectorAll('.js-ncountry').forEach(el => { el.textContent = TRAVEL.length; });
+syncCountryCount();
+
+const tOverlay = document.getElementById('travelOverlay');
+const tDrawer  = document.getElementById('travelDrawer');
+const tPanel   = document.getElementById('travelPanel');
+const tMapWrap = document.getElementById('travelMapWrap');
+const tLoading = document.getElementById('tmLoading');
+const tSvg     = document.getElementById('tmapSvg');
+const tPins    = document.getElementById('tmPins');
+const tTip     = document.getElementById('tmTip');
+
+let MW = 1e6;                         // 地图世界宽度（与 travel-map.json 的 W 一致）
+let mapState = 'idle';                // idle | loading | ready | failed
+let tView = { mode: 'world', cid: null, rid: null };
+let vb = { x: 0, y: 0, w: 1, h: 1 }, cw = 1, ch = 1;
+let viewTween = null, viewTweenDone = null, pins = [], tLastFocused = null, pendingEnter = null;
+let dragMoved = false, dragging = false;
+
+const tt = () => TT[LANG] || TT.zh;
+const nm = o => (LANG === 'en' ? o.en : o.zh);
+const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+const isMobile = () => window.innerWidth < 900;
+/* Web Mercator，与 travel-map.json 的投影一致 */
+const px = lng => (lng + 180) / 360 * MW;
+const py = lat => {
+  const r = clamp(lat, -85, 85) * Math.PI / 180;
+  return (1 - Math.log(Math.tan(Math.PI / 4 + r / 2)) / Math.PI) / 2 * MW;
+};
+const boxLL = b => [px(b[0][1]), py(b[1][0]), px(b[1][1]), py(b[0][0])]; // [[s,w],[n,e]] → [x0,y0,x1,y1]
+const minW = () => MW * 0.1 / 360;
+const maxW = () => MW * 1.05;
+
+/* ---------- 视图：viewBox 计算 / 动画 ---------- */
+function clampVB(v){
+  const w = clamp(v.w, minW(), maxW()), h = w * ch / cw;
+  const cx = clamp(v.x + v.w / 2, 0, MW), cy = clamp(v.y + v.h / 2, py(82), py(-60));
+  return { x: cx - w / 2, y: cy - h / 2, w, h };
+}
+function fitView(box){
+  const pad = isMobile() ? { t: 54, r: 22, b: 22, l: 22 } : { t: 70, r: 56, b: 56, l: 56 };
+  const aw = Math.max(cw - pad.l - pad.r, 40), ah = Math.max(ch - pad.t - pad.b, 40);
+  const s = clamp(Math.max((box[2] - box[0]) / aw, (box[3] - box[1]) / ah), minW() / cw, maxW() / cw);
+  const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2;
+  return clampVB({ x: cx - s * (pad.l + aw / 2), y: cy - s * (pad.t + ah / 2), w: cw * s, h: ch * s });
+}
+function worldView(){
+  return fitView(isMobile() ? boxLL([[-12, -12], [70, 150]]) : boxLL([[-50, -168], [75, 180]]));
+}
+function applyView(){
+  tSvg.setAttribute('viewBox', `${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`);
+  placePins();
+}
+function stopTween(){
+  // 被打断（拖动 / 再点别的国家）时也执行收尾回调，保证城市光点照常出现；回调内部自己判断是否仍然有效
+  if (viewTween) {
+    viewTween.kill(); viewTween = null; tSvg.classList.remove('moving');
+    const d = viewTweenDone; viewTweenDone = null;
+    if (d) d();
+  }
+}
+/* 缩放用对数插值；中心跟随缩放进度移动，避免放大途中目标飞出画面 */
+function animateTo(t, dur, done){
+  stopTween();
+  if (prefersReduced || !dur) { vb = t; applyView(); if (done) done(); return; }
+  viewTweenDone = done || null;
+  const a = { ...vb }, la = Math.log(a.w), lb = Math.log(t.w);
+  const acx = a.x + a.w / 2, acy = a.y + a.h / 2, bcx = t.x + t.w / 2, bcy = t.y + t.h / 2;
+  const panOnly = Math.abs(t.w - a.w) / Math.max(a.w, t.w) < 0.15;
+  const o = { k: 0 };
+  tSvg.classList.add('moving');
+  viewTween = gsap.to(o, {
+    k: 1, duration: dur, ease: 'power3.inOut',
+    onUpdate(){
+      const w = Math.exp(la + (lb - la) * o.k), h = w * ch / cw;
+      const f = panOnly ? o.k : (w - a.w) / (t.w - a.w);
+      const cx = acx + (bcx - acx) * f, cy = acy + (bcy - acy) * f;
+      vb = { x: cx - w / 2, y: cy - h / 2, w, h };
+      applyView();
+    },
+    onComplete(){
+      viewTween = null; viewTweenDone = null; tSvg.classList.remove('moving');
+      vb = t; applyView();
+      if (done) done();
+    },
+  });
+}
+
+/* ---------- 构建 SVG ---------- */
+function graticule(){
+  let d = '';
+  for (let lng = -180; lng <= 180; lng += 15) d += `M${px(lng).toFixed(0)} ${py(82).toFixed(0)}V${py(-60).toFixed(0)}`;
+  for (let lat = -60; lat <= 75; lat += 15) d += `M0 ${py(lat).toFixed(0)}H${MW}`;
+  return d;
+}
+function buildMap(data){
+  MW = data.W;
+  const cn = TRAVEL_BY_ID.CN, tw = cn.regions[0];
+  const hb = boxLL(tw.hit);
+  tSvg.innerHTML =
+    `<path class="tm-grat" d="${graticule()}"/>` +
+    `<path class="tm-land" d="${data.rest}"/>` +
+    `<g>${TRAVEL.map((c, i) => data.c[c.id]
+        ? `<path class="tm-c lit-in" data-id="${c.id}" style="--d:${(0.15 + i * 0.035).toFixed(2)}s" d="${data.c[c.id]}"/>` : '').join('')}</g>` +
+    `<path class="tm-jd" d="${data.jd}"/>` +
+    `<rect class="tm-hit" data-rid="${tw.id}" x="${hb[0]}" y="${hb[1]}" width="${hb[2] - hb[0]}" height="${hb[3] - hb[1]}"/>`;
+  // 点亮动画结束后移除动画类，让后续的模式切换过渡生效
+  setTimeout(() => tSvg.querySelectorAll('.tm-c.lit-in').forEach(p => p.classList.remove('lit-in')), 2400);
+}
+
+/* ---------- 光点 / 标签（HTML 叠加层） ---------- */
+const dotHTML = label =>
+  `<button type="button" class="gm-btn" aria-label="${label}"><span class="gm-zone"></span><span class="gm-ring"></span><span class="gm-core"></span><span class="gm-lb">${label}</span></button>`;
+
+function makePin(o){
+  const el = document.createElement('div');
+  el.className = 'gm ' + o.cls;
+  el.innerHTML = o.html;
+  if (o.style) el.setAttribute('style', o.style);
+  el.querySelector('.gm-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    if (dragMoved) return;
+    if (o.onTap) o.onTap();
+  });
+  if (o.onHover) {
+    el.addEventListener('mouseenter', () => o.onHover(true));
+    el.addEventListener('mouseleave', () => o.onHover(false));
+  }
+  tPins.appendChild(el);
+  const p = { ...o, el, vis: true, sx: 0, sy: 0 };
+  pins.push(p);
+  return p;
+}
+function clearPins(){ pins.forEach(p => p.el.remove()); pins = []; }
+function placePins(){
+  for (const p of pins) {
+    const sx = (p.x - vb.x) / vb.w * cw, sy = (p.y - vb.y) / vb.h * ch;
+    p.sx = sx; p.sy = sy;
+    const vis = sx > -80 && sx < cw + 80 && sy > -40 && sy < ch + 40;
+    if (vis !== p.vis) { p.vis = vis; p.el.style.display = vis ? '' : 'none'; }
+    if (vis) p.el.style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px)`;
+  }
+}
+function measurePins(){
+  pins.forEach(p => {
+    const lb = p.el.querySelector('.gm-lb, .gm-badge');
+    if (lb) { p.lw = lb.offsetWidth; p.lh = lb.offsetHeight; }
+  });
+}
+function buildWorldPins(){
+  clearPins();
+  TRAVEL.filter(c => c.tiny).forEach((c, i) => makePin({
+    kind: 'tiny', x: px(c.tiny[1]), y: py(c.tiny[0]), cls: 'gm-tiny', style: `--pd:${i * 0.8}s`,
+    html: dotHTML(`${c.f} ${nm(c)}`), onTap: () => enterCountry(c.id),
+  }));
+  placePins();
+}
+function buildCityPins(c){
+  clearPins();
+  c.cities.forEach((ct, i) => makePin({
+    kind: 'city', i, rg: ct.rg || null, x: px(ct.lng), y: py(ct.lat),
+    cls: 'gm-city pre', style: `--pd:${((i % 6) * 0.4).toFixed(1)}s`,
+    html: dotHTML(nm(ct)), onTap: () => focusCity(i), onHover: on => hlCityItem(on ? i : -1),
+  }));
+  (c.regions || []).forEach(r => {
+    const n = c.cities.filter(ct => ct.rg === r.id).length;
+    makePin({
+      kind: 'cluster', rid: r.id, x: px(r.at[1]) , y: py(r.at[0]), cls: 'gm-cluster pre',
+      html: `<button type="button" class="gm-btn"><span class="gm-badge">${nm(r)}<b>${n}</b>↗</span></button>`,
+      onTap: () => enterRegion(r.id),
+    });
+  });
+  measurePins();
+  applyRegionState();
+  placePins();
+}
+/* 台湾地区：中国视图里折叠（小点 + 标签牌），进入后展开 */
+function applyRegionState(){
+  const inRegion = tView.mode === 'region';
+  pins.forEach(p => {
+    if (p.kind === 'city' && p.rg) p.el.classList.toggle('muted', !inRegion || p.rg !== tView.rid);
+    if (p.kind === 'cluster') p.el.classList.toggle('off', inRegion);
+  });
+}
+function revealPins(){
+  let k = 0;
+  pins.forEach(p => {
+    if (!p.el.classList.contains('pre')) return;
+    p.el.classList.remove('pre');
+    p.el.style.setProperty('--d', (Math.min(k++, 30) * 0.045).toFixed(3) + 's');
+    p.el.classList.add('pop');
+  });
+  layoutLabels();
+}
+/* 标签避让：按数据顺序（越靠前越优先）依次尝试 右 / 左 / 上 / 下，放不下就先隐藏，悬停或放大后再显示 */
+function layoutLabels(){
+  const placed = [], dots = [];
+  const hit = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  pins.forEach(p => {
+    if (!p.vis || p.el.classList.contains('off')) return;
+    const r = p.el.classList.contains('muted') ? 3 : 6;
+    dots.push({ p, x: p.sx - r, y: p.sy - r, w: r * 2, h: r * 2 });
+    if (p.kind === 'cluster') placed.push({ x: p.sx + 12, y: p.sy - 13, w: p.lw || 90, h: p.lh || 24 });
+  });
+  pins.forEach(p => {
+    if (p.kind !== 'city') return;
+    p.el.classList.remove('lb-r', 'lb-l', 'lb-t', 'lb-b');
+    if (p.el.classList.contains('muted')) return;
+    if (!p.vis) { p.el.classList.add('nolb'); return; }
+    const lw = p.lw || 40, lh = p.lh || 18;
+    const cands = [
+      ['lb-r', p.sx + 12, p.sy - lh / 2], ['lb-l', p.sx - 12 - lw, p.sy - lh / 2],
+      ['lb-t', p.sx - lw / 2, p.sy - 9 - lh], ['lb-b', p.sx - lw / 2, p.sy + 9],
+    ];
+    let ok = null;
+    for (const [k, x, y] of cands) {
+      const r = { x, y, w: lw, h: lh };
+      if (x < 2 || y < 2 || x + lw > cw - 2 || y + lh > ch - 2) continue;
+      if (placed.some(q => hit(r, q)) || dots.some(d => d.p !== p && hit(r, d))) continue;
+      ok = k; placed.push(r); break;
+    }
+    p.el.classList.toggle('nolb', !ok);
+    if (ok) p.el.classList.add(ok);
+  });
+}
+let layoutTimer = null;
+function scheduleLayout(){ clearTimeout(layoutTimer); layoutTimer = setTimeout(layoutLabels, 140); }
+
+/* ---------- 模式切换 ---------- */
+function setModeClasses(){
+  tMapWrap.classList.remove('mode-world', 'mode-country', 'mode-region', 'cn');
+  tMapWrap.classList.add('mode-' + tView.mode);
+  if (tView.cid === 'CN') tMapWrap.classList.add('cn');
+  tSvg.querySelectorAll('.tm-c').forEach(p => p.classList.toggle('on', p.dataset.id === tView.cid));
+}
+function syncUI(){ setModeClasses(); renderTravelPanel(); updateTravelHeader(); hideTip(); }
+
+function enterCountry(cid, after){
+  const c = TRAVEL_BY_ID[cid];
+  if (!c) return;
+  tView = { mode: 'country', cid, rid: null };
+  syncUI();
+  if (mapState !== 'ready') { if (mapState === 'loading') pendingEnter = () => enterCountry(cid, after); return; }
+  stopTween();
+  clearPins();
+  animateTo(fitView(boxLL(c.b)), 1.25, () => {
+    if (tView.mode !== 'country' || tView.cid !== cid) return;
+    buildCityPins(c);
+    revealPins();
+    if (after) after();
+  });
+}
+function enterRegion(rid, focusIdx){
+  const c = TRAVEL_BY_ID.CN, r = c.regions.find(x => x.id === rid);
+  if (!r) return;
+  if (tView.cid !== 'CN') { enterCountry('CN', () => enterRegion(rid, focusIdx)); return; }
+  tView = { mode: 'region', cid: 'CN', rid };
+  syncUI();
+  if (mapState !== 'ready') return;
+  stopTween();
+  if (!pins.some(p => p.kind === 'city')) buildCityPins(c);
+  pins.forEach(p => { if (p.rg === rid) { p.el.classList.remove('pop'); p.el.classList.add('pre'); } });
+  applyRegionState();
+  measurePins();
+  animateTo(fitView(boxLL(r.b)), 1.0, () => {
+    if (tView.mode !== 'region' || tView.rid !== rid) return;
+    revealPins();
+    if (focusIdx != null) hlCity(focusIdx);
+  });
+}
+function backToCountry(){
+  tView = { mode: 'country', cid: 'CN', rid: null };
+  syncUI();
+  if (mapState !== 'ready') return;
+  applyRegionState();
+  animateTo(fitView(boxLL(TRAVEL_BY_ID.CN.b)), 1.0, layoutLabels);
+}
+function backToWorld(){
+  tView = { mode: 'world', cid: null, rid: null };
+  syncUI();
+  if (mapState !== 'ready') return;
+  buildWorldPins();
+  animateTo(worldView(), 1.15);
+}
+function goBack(){ tView.mode === 'region' ? backToCountry() : backToWorld(); }
+
+function hlCity(i){
+  pins.forEach(p => { if (p.kind === 'city') p.el.classList.toggle('hl', p.i === i); });
+  hlCityItem(i);
+}
+function hlCityItem(i){
+  tPanel.querySelectorAll('.tp-cities button').forEach(b => b.classList.toggle('hl', +b.dataset.city === i));
+}
+function focusCity(i){
+  const c = TRAVEL_BY_ID[tView.cid];
+  if (!c) return;
+  const ct = c.cities[i];
+  if (ct.rg && tView.mode !== 'region') { enterRegion(ct.rg, i); return; }
+  hlCity(i);
+  if (mapState !== 'ready') return;
+  const w = Math.min(vb.w, Math.max(minW(), Math.min(vb.w * 0.45, MW * 2.6 / 360))), h = w * ch / cw;
+  animateTo(clampVB({ x: px(ct.lng) - w / 2, y: py(ct.lat) - h / 2, w, h }), 0.9, layoutLabels);
+}
+
+/* ---------- 右侧面板 ---------- */
+function cityList(c, idx){
+  return `<ul class="tp-cities">${idx.map((i, k) => {
+    const ct = c.cities[i];
+    return `<li><button type="button" data-city="${i}" style="--d:${(0.1 + k * 0.035).toFixed(3)}s">` +
+      `<span class="cdot"></span><span class="cn">${nm(ct)}</span>${ct.note ? `<span class="cnote">${nm(ct.note)}</span>` : ''}</button></li>`;
+  }).join('')}</ul>`;
+}
+function renderTravelPanel(){
+  const T = tt();
+  if (tView.mode === 'world') {
+    const groups = CONTINENTS.map(g => {
+      const list = TRAVEL.filter(c => c.ct === g.k);
+      if (!list.length) return '';
+      const chips = list.map(c =>
+        `<button type="button" class="tp-chip" data-cid="${c.id}"><span class="fl">${c.f}</span><span>${nm(c)}</span>${c.cities.length ? `<span class="ct">${c.cities.length}</span>` : ''}</button>`
+      ).join('');
+      return `<div class="tp-group"><div class="tp-gh">${nm(g)} <span class="n">${list.length}</span></div><div class="tp-chips">${chips}</div></div>`;
+    }).join('');
+    const nCont = new Set(TRAVEL.map(c => c.ct)).size;
+    tPanel.innerHTML = `
+      <div class="tp-stats">
+        <div class="tp-stat"><b>${TRAVEL.length}</b><span>${T.countries}</span></div>
+        <div class="tp-stat"><b>${CITY_TOTAL}</b><span>${T.cities}</span></div>
+        <div class="tp-stat"><b>${nCont}</b><span>${T.continents}</span></div>
+      </div>
+      <p class="tp-hint">${mapState === 'failed' ? T.hintNoMap : T.hint}</p>
+      ${groups}`;
+  } else if (tView.mode === 'region') {
+    const c = TRAVEL_BY_ID.CN, r = c.regions.find(x => x.id === tView.rid);
+    const idx = c.cities.map((ct, i) => ct.rg === r.id ? i : -1).filter(i => i >= 0);
+    tPanel.innerHTML = `
+      <button type="button" class="tp-back" data-act="back">${T.backPanelCN}</button>
+      <div class="tp-country"><span class="tp-flag">${c.f}</span>
+        <div><div class="tp-cname">${r.zh}</div><div class="tp-cen">${r.en}</div></div></div>
+      <div class="tp-lit">${T.lit(idx.length)}</div>
+      ${cityList(c, idx)}`;
+  } else {
+    const c = TRAVEL_BY_ID[tView.cid];
+    let body;
+    if (!c.cities.length) {
+      body = `<div class="tp-empty">${T.empty}</div>`;
+    } else if (c.regions) {
+      const all = c.cities.map((_, i) => i);
+      const main = all.filter(i => !c.cities[i].rg && !c.cities[i].sar);
+      const sar = all.filter(i => c.cities[i].sar);
+      body = `<div class="tp-group"><div class="tp-gh">${T.mainland} <span class="n">${main.length}</span></div>${cityList(c, main)}</div>` +
+        (sar.length ? `<div class="tp-group"><div class="tp-gh">${T.sar} <span class="n">${sar.length}</span></div>${cityList(c, sar)}</div>` : '') +
+        c.regions.map(r => {
+          const ri = all.filter(i => c.cities[i].rg === r.id);
+          return `<div class="tp-group"><button type="button" class="tp-gh" data-rid="${r.id}">${nm(r)} <span class="n">${ri.length}</span><span class="go">${T.open} ↗</span></button>${cityList(c, ri)}</div>`;
+        }).join('');
+    } else {
+      body = cityList(c, c.cities.map((_, i) => i));
+    }
+    tPanel.innerHTML = `
+      <button type="button" class="tp-back" data-act="back">${T.backPanel}</button>
+      <div class="tp-country"><span class="tp-flag">${c.f}</span>
+        <div><div class="tp-cname">${c.zh}</div><div class="tp-cen">${c.en}</div></div></div>
+      ${c.cities.length ? `<div class="tp-lit">${T.lit(c.cities.length)}</div>` : ''}
+      ${body}`;
+  }
+  tPanel.scrollTop = 0;
+}
+tPanel.addEventListener('click', e => {
+  const chip = e.target.closest('.tp-chip');
+  if (chip) return enterCountry(chip.dataset.cid);
+  const rg = e.target.closest('[data-rid]');
+  if (rg) return enterRegion(rg.dataset.rid);
+  const city = e.target.closest('.tp-cities button');
+  if (city) return focusCity(+city.dataset.city);
+  if (e.target.closest('[data-act="back"]')) goBack();
+});
+function hlPath(cid, on){
+  const p = tSvg.querySelector(`.tm-c[data-id="${cid}"]`);
+  if (p) p.classList.toggle('hl', on);
+}
+tPanel.addEventListener('mouseover', e => {
+  const chip = e.target.closest('.tp-chip');
+  if (chip) hlPath(chip.dataset.cid, true);
+  const city = e.target.closest('.tp-cities button');
+  if (city) pins.forEach(p => { if (p.kind === 'city') p.el.classList.toggle('hl', p.i === +city.dataset.city); });
+});
+tPanel.addEventListener('mouseout', e => {
+  const chip = e.target.closest('.tp-chip');
+  if (chip && !chip.contains(e.relatedTarget)) hlPath(chip.dataset.cid, false);
+  const city = e.target.closest('.tp-cities button');
+  if (city && !city.contains(e.relatedTarget) && !city.classList.contains('hl')) {
+    pins.forEach(p => { if (p.kind === 'city' && p.i === +city.dataset.city) p.el.classList.remove('hl'); });
+  }
+});
+
+function updateTravelHeader(){
+  const T = tt();
+  document.getElementById('travelTitle').textContent = T.title;
+  document.getElementById('tmBackTxt').textContent = tView.mode === 'region' ? T.backCN : T.back;
+  document.getElementById('tmHint').innerHTML = window.matchMedia('(pointer: fine)').matches ? T.mapHint : T.mapHintTouch;
+  document.getElementById('tmSrc').textContent = T.src;
+  document.getElementById('travelClose').setAttribute('aria-label', T.close);
+  document.getElementById('tmZoomIn').setAttribute('aria-label', T.zin);
+  document.getElementById('tmZoomOut').setAttribute('aria-label', T.zout);
+  const c = tView.cid && TRAVEL_BY_ID[tView.cid];
+  const r = c && tView.rid && c.regions.find(x => x.id === tView.rid);
+  document.getElementById('travelCrumb').textContent =
+    'WORLD' + (c ? ` / ${c.en.toUpperCase()}` : '') + (r ? ` / ${r.en.toUpperCase()}` : '');
+}
+
+/* 语言切换时由 applyLang 调用 */
+function travelOnLang(){
+  updateTravelHeader();
+  if (tDrawer.getAttribute('aria-hidden') === 'false') renderTravelPanel();
+  if (mapState !== 'ready') return;
+  if (tView.mode === 'world') buildWorldPins();
+  else {
+    const keep = pins.filter(p => p.kind === 'city' && p.el.classList.contains('hl')).map(p => p.i);
+    buildCityPins(TRAVEL_BY_ID[tView.cid]);
+    pins.forEach(p => p.el.classList.remove('pre'));
+    layoutLabels();
+    if (keep.length) hlCity(keep[0]);
+  }
+}
+
+/* ---------- 悬停提示 ---------- */
+function hideTip(){ tTip.classList.remove('show'); }
+tSvg.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || dragging || mapState !== 'ready') return;
+  const el = e.target.closest && e.target.closest('.tm-c, .tm-hit');
+  if (!el) return hideTip();
+  let html;
+  if (el.classList.contains('tm-hit')) {
+    const c = TRAVEL_BY_ID.CN, r = c.regions.find(x => x.id === el.dataset.rid);
+    html = `${nm(r)}<span class="s">${tt().tip(c.cities.filter(ct => ct.rg === r.id).length)} ↗</span>`;
+  } else {
+    if (el.dataset.id === tView.cid) return hideTip();
+    const c = TRAVEL_BY_ID[el.dataset.id];
+    html = `${c.f} ${nm(c)}<span class="s">${tt().tip(c.cities.length)}</span>`;
+  }
+  const r = tMapWrap.getBoundingClientRect();
+  tTip.innerHTML = html;
+  const x = Math.min(e.clientX - r.left + 14, cw - tTip.offsetWidth - 6);
+  tTip.style.transform = `translate(${x}px, ${e.clientY - r.top + 16}px)`;
+  tTip.classList.add('show');
+});
+tSvg.addEventListener('pointerleave', hideTip);
+tSvg.addEventListener('click', e => {
+  if (dragMoved || mapState !== 'ready') return;
+  const hitEl = e.target.closest('.tm-hit');
+  if (hitEl && tView.cid === 'CN' && tView.mode === 'country') return enterRegion(hitEl.dataset.rid);
+  const p = e.target.closest('.tm-c');
+  if (p && p.dataset.id !== tView.cid) enterCountry(p.dataset.id);
+});
+
+/* ---------- 拖动 / 缩放（鼠标、触摸、触控板） ---------- */
+const ptrs = new Map();
+let gesture = null;
+const centroid = pts => ({ x: pts.reduce((s, p) => s + p.x, 0) / pts.length, y: pts.reduce((s, p) => s + p.y, 0) / pts.length });
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+function startGesture(){
+  const pts = [...ptrs.values()];
+  gesture = { vb: { ...vb }, rect: tMapWrap.getBoundingClientRect(), c: centroid(pts), d: pts.length > 1 ? dist(pts[0], pts[1]) : 0, n: pts.length };
+}
+tMapWrap.addEventListener('pointerdown', e => {
+  if (mapState !== 'ready' || e.button > 0 || e.target.closest('.tm-back, .tm-zoom')) return;
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  stopTween();
+  if (ptrs.size === 1) dragMoved = false;
+  startGesture();
+});
+window.addEventListener('pointermove', e => {
+  if (!ptrs.has(e.pointerId) || !gesture) return;
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  const pts = [...ptrs.values()], g = gesture, c = centroid(pts);
+  if (!dragMoved && pts.length === 1 && dist(c, g.c) < 5) return;
+  dragMoved = true; dragging = true; hideTip();
+  tSvg.classList.add('moving');
+  let w = g.vb.w;
+  if (pts.length > 1 && g.d > 0) w = g.vb.w * g.d / Math.max(dist(pts[0], pts[1]), 1);
+  w = clamp(w, minW(), maxW());
+  const h = w * ch / cw;
+  const ux = g.vb.x + (g.c.x - g.rect.left) / cw * g.vb.w, uy = g.vb.y + (g.c.y - g.rect.top) / ch * g.vb.h;
+  vb = clampVB({ x: ux - (c.x - g.rect.left) / cw * w, y: uy - (c.y - g.rect.top) / ch * h, w, h });
+  applyView();
+});
+function endPointer(e){
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.delete(e.pointerId);
+  if (ptrs.size) { startGesture(); return; }
+  gesture = null;
+  if (dragging) { dragging = false; tSvg.classList.remove('moving'); scheduleLayout(); }
+}
+window.addEventListener('pointerup', endPointer);
+window.addEventListener('pointercancel', endPointer);
+function zoomAt(sx, sy, f){
+  const ux = vb.x + sx / cw * vb.w, uy = vb.y + sy / ch * vb.h;
+  const w = clamp(vb.w / f, minW(), maxW()), h = w * ch / cw;
+  vb = clampVB({ x: ux - sx / cw * w, y: uy - sy / ch * h, w, h });
+  applyView(); hideTip(); scheduleLayout();
+}
+tMapWrap.addEventListener('wheel', e => {
+  if (mapState !== 'ready') return;
+  e.preventDefault();
+  stopTween();
+  const r = tMapWrap.getBoundingClientRect();
+  const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+  zoomAt(e.clientX - r.left, e.clientY - r.top, Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0016)));
+}, { passive: false });
+tMapWrap.addEventListener('dblclick', e => {
+  if (mapState !== 'ready' || e.target.closest('.tm-back, .tm-zoom, .gm')) return;
+  const r = tMapWrap.getBoundingClientRect(), sx = e.clientX - r.left, sy = e.clientY - r.top;
+  const ux = vb.x + sx / cw * vb.w, uy = vb.y + sy / ch * vb.h, w = vb.w / 2, h = w * ch / cw;
+  animateTo(clampVB({ x: ux - sx / cw * w, y: uy - sy / ch * h, w, h }), 0.45, layoutLabels);
+});
+function zoomBtn(f){
+  if (mapState !== 'ready') return;
+  const cx = vb.x + vb.w / 2, cy = vb.y + vb.h / 2, w = vb.w / f, h = w * ch / cw;
+  animateTo(clampVB({ x: cx - w / 2, y: cy - h / 2, w, h }), 0.45, layoutLabels);
+}
+document.getElementById('tmZoomIn').addEventListener('click', () => zoomBtn(2));
+document.getElementById('tmZoomOut').addEventListener('click', () => zoomBtn(0.5));
+new ResizeObserver(() => {
+  const w = tMapWrap.clientWidth, h = tMapWrap.clientHeight;
+  if (!w || !h || (w === cw && h === ch)) return;
+  const k = w / cw;
+  cw = w; ch = h;
+  if (mapState !== 'ready') return;
+  vb = clampVB({ x: vb.x, y: vb.y, w: vb.w * k, h: vb.w * k * ch / cw });
+  applyView(); scheduleLayout();
+}).observe(tMapWrap);
+
+/* ---------- 加载地图数据（打开抽屉时才加载，不影响首屏） ---------- */
+function loadMapData(){
+  if (!loadMapData._p) {
+    loadMapData._p = fetch('travel-map.json').then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  return loadMapData._p;
+}
+function initMap(){
+  mapState = 'loading';
+  loadMapData().then(data => {
+    cw = tMapWrap.clientWidth || cw; ch = tMapWrap.clientHeight || ch;
+    buildMap(data);
+    mapState = 'ready';
+    vb = worldView(); applyView();
+    setTimeout(() => tLoading.classList.add('hide'), 200);
+    if (pendingEnter) { const f = pendingEnter; pendingEnter = null; f(); }
+    else if (tView.mode === 'world') buildWorldPins();
+  }).catch(err => {
+    console.warn('[travel]', err.message);
+    mapState = 'failed';
+    tDrawer.classList.add('no-map');
+    renderTravelPanel();
+  });
+}
+
+/* ---------- 打开 / 关闭 ---------- */
+function openTravel(target){
+  closeNavMenu();
+  const wasOpen = tDrawer.getAttribute('aria-hidden') === 'false';
+  if (!wasOpen) {
+    tLastFocused = document.activeElement;
+    document.body.classList.add('locked');
+    tOverlay.classList.add('open');
+    tDrawer.setAttribute('aria-hidden', 'false');
+    if (prefersReduced) {
+      gsap.set(tOverlay, { autoAlpha: 1 });
+      gsap.set(tDrawer, { y: 0 });
+    } else {
+      gsap.to(tOverlay, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' });
+      gsap.fromTo(tDrawer, { y: '100%' }, { y: '0%', duration: 0.6, ease: 'power4.out' });
+    }
+    document.getElementById('travelClose').focus();
+  }
+  if (target) {
+    tView = { mode: 'world', cid: null, rid: null };
+    syncUI();
+    pendingEnter = target;
+  } else if (!wasOpen) {
+    tView = { mode: 'world', cid: null, rid: null };
+    syncUI();
+  }
+  if (mapState === 'idle') { initMap(); return; }
+  if (mapState !== 'ready') return;
+  if (pendingEnter) { const f = pendingEnter; pendingEnter = null; f(); }
+  else if (!wasOpen) { buildWorldPins(); vb = worldView(); applyView(); }
+}
+function closeTravel(){
+  if (tDrawer.getAttribute('aria-hidden') === 'true') return;
+  stopTween(); hideTip();
+  const done = () => {
+    tOverlay.classList.remove('open');
+    tDrawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('locked');
+    if (tLastFocused) tLastFocused.focus();
+  };
+  if (prefersReduced) {
+    gsap.set(tOverlay, { autoAlpha: 0 });
+    gsap.set(tDrawer, { y: '100%' });
+    done();
+  } else {
+    gsap.to(tOverlay, { autoAlpha: 0, duration: 0.35, ease: 'power2.in' });
+    gsap.to(tDrawer, { y: '100%', duration: 0.5, ease: 'power3.in', onComplete: done });
+  }
+}
+document.getElementById('travelClose').addEventListener('click', closeTravel);
+document.getElementById('travelGrip').addEventListener('click', closeTravel);
+document.getElementById('tmBack').addEventListener('click', goBack);
+tOverlay.addEventListener('click', closeTravel);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeTravel(); closeNavMenu(); } });
+
+/* ---------- 导航「经历」下拉：工作 / 旅行 ---------- */
+const navDD = document.getElementById('navExpDD');
+const navTrigger = navDD.querySelector('.nav-dd-trigger');
+let navCloseTimer = null;
+function openNavMenu(){ clearTimeout(navCloseTimer); navDD.classList.add('open'); navTrigger.setAttribute('aria-expanded', 'true'); }
+function closeNavMenu(){ navDD.classList.remove('open'); navTrigger.setAttribute('aria-expanded', 'false'); }
+const finePointer = window.matchMedia('(pointer: fine)').matches;
+navTrigger.addEventListener('click', e => {
+  e.preventDefault();
+  // 桌面端悬停已展开，点击只负责展开；触屏端点击切换开/关
+  if (finePointer) openNavMenu();
+  else navDD.classList.contains('open') ? closeNavMenu() : openNavMenu();
+});
+if (finePointer) {
+  navDD.addEventListener('mouseenter', openNavMenu);
+  navDD.addEventListener('mouseleave', () => { navCloseTimer = setTimeout(closeNavMenu, 180); });
+}
+document.addEventListener('click', e => { if (!navDD.contains(e.target)) closeNavMenu(); });
+navDD.querySelectorAll('.nav-menu button').forEach(b => {
+  b.addEventListener('click', () => {
+    closeNavMenu();
+    if (b.dataset.go === 'travel') openTravel();
+    else document.getElementById('exp').scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth' });
+  });
+});
+document.getElementById('expTravelTab').addEventListener('click', () => openTravel());
+
+/* 动态元素也套用自定义光标的放大效果 */
+if (window.matchMedia('(pointer: fine)').matches) {
+  const cDot = document.getElementById('curDot'), cRing = document.getElementById('curRing');
+  const sel = '.tp-chip, .tp-cities button, .tp-back, button.tp-gh, .tm-back, .tm-zoom button, .gm-btn, .tm-c, .exp-tab, .nav-menu button';
+  const grow = () => { cDot.style.width = cDot.style.height = '6px'; cRing.style.width = cRing.style.height = '54px'; cRing.style.opacity = '0.7'; };
+  const shrink = () => { cDot.style.width = cDot.style.height = '10px'; cRing.style.width = cRing.style.height = '36px'; cRing.style.opacity = '0.45'; };
+  document.addEventListener('mouseover', e => { if (e.target.closest && e.target.closest(sel)) grow(); });
+  document.addEventListener('mouseout', e => {
+    const from = e.target.closest && e.target.closest(sel);
+    const to = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(sel);
+    if (from && !to) shrink();
+  });
+}
+
+/* 支持直接分享链接：…/portfolio/#travel、#travel/JP（直接放大到某个国家）、#travel/TW（台湾地区） */
+(function(){
+  const m = location.hash.match(/^#travel(?:\/([A-Za-z]{2}))?$/);
+  if (!m) return;
+  const id = m[1] && m[1].toUpperCase();
+  const target = id === 'TW' ? () => enterRegion('TW') : (id && TRAVEL_BY_ID[id] ? () => enterCountry(id) : null);
+  setTimeout(() => openTravel(target), 600);
+})();
+
+/* ============================================================
    i18n 静态文案字典（en）。zh 直接用 DOM 原文，只在切到 en 时替换。
    ============================================================ */
 const I18N = {
   // nav
   nav_work:'WORK', nav_exp:'EXPERIENCE', nav_about:'ABOUT', nav_contact:'CONTACT',
+  dd_work:'Work', dd_work_s:'Internships &amp; full-time · 6 roles',
+  dd_travel:'Travel', dd_travel_s:'<span class="js-ncountry">30</span> countries · footprint map',
+  exp_tab_work:'Work', exp_tab_travel:'Travel',
   // hero
   hero_eyebrow:'Product Operations · Trust &amp; Safety · GenAI · Content Ecosystem',
   hero_desc:'Let data speak, let content instinct drive growth. Full-chain hands-on experience across WeChat Channels · TikTok · Farfetch · Mango TV, spanning trust &amp; safety, GenAI evaluation, creator ecosystem and e-commerce growth.',
@@ -1792,6 +3051,10 @@ function applyLang(lang, animate){
     // 重渲染后 d-anim 需可见
     gsap.set('.d-anim', { autoAlpha: 1, y: 0 });
   }
+
+  // 旅行足迹抽屉同步语言
+  syncCountryCount();
+  travelOnLang();
 }
 
 /* 语言开关点击（在中英之间切换） */
