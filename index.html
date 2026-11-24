@@ -440,6 +440,7 @@ footer span {
 .drawer {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 501;
   height: 86vh; max-height: 86vh;
+  height: 86dvh; max-height: 86dvh;
   background: #0c0c0c;
   border-top: 2px solid var(--acid);
   box-shadow: 0 -30px 80px rgba(0,0,0,0.6);
@@ -625,7 +626,7 @@ footer span {
 .exp-tab .tt-badge { font-size: 0.55rem; border: 1px solid currentColor; padding: 0 0.3rem; }
 
 /* ============ 旅行足迹 半开屏（自绘 SVG 地图） ============ */
-.travel-drawer { height: 88vh; max-height: 88vh; }
+.travel-drawer { height: 88vh; max-height: 88vh; height: 88dvh; max-height: 88dvh; }
 .travel-drawer .drawer-top { padding-bottom: 1.2rem; }
 .travel-body {
   flex: 1; min-height: 0;
@@ -853,6 +854,132 @@ button.tp-gh:hover { color: var(--white); }
 .travel-drawer.no-map .travel-mapwrap { display: none; }
 .travel-drawer.no-map .travel-panel { border-left: 0; padding: 2rem 3rem 3rem; }
 
+/* ============ 手机 / iPad：左上角菜单按钮 + 侧边栏 ============ */
+.nav-left { display: flex; align-items: center; gap: 0.9rem; }
+.nav-burger {
+  display: none; flex-direction: column; justify-content: center; align-items: flex-start; gap: 5px;
+  width: 40px; height: 40px; padding: 0 10px; flex-shrink: 0;
+  background: rgba(10,10,10,0.55); border: 1px solid rgba(200,255,0,0.45);
+  transition: background 0.2s, border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-burger span { display: block; height: 1.5px; width: 18px; background: var(--white); transition: width 0.25s, background 0.2s; }
+.nav-burger span:nth-child(2) { width: 12px; background: var(--acid); }
+.nav-burger:active { background: var(--acid); }
+.nav-burger:active span { background: var(--black); }
+
+.mnav-overlay {
+  position: fixed; inset: 0; z-index: 600;
+  background: rgba(5,5,5,0.62); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0s linear 0.3s;
+  touch-action: none;
+}
+.mnav-overlay.open { opacity: 1; visibility: visible; transition: opacity 0.3s; }
+.mnav {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 601;
+  width: min(84vw, 360px); height: 100vh; height: 100dvh;
+  background: #0c0c0c; border-right: 2px solid var(--acid);
+  box-shadow: 30px 0 80px rgba(0,0,0,0.55);
+  display: flex; flex-direction: column;
+  transform: translateX(-104%); visibility: hidden;
+  transition: transform 0.42s cubic-bezier(.22,1,.36,1), visibility 0s linear 0.42s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mnav.open { transform: none; visibility: visible; transition: transform 0.42s cubic-bezier(.22,1,.36,1); }
+.mnav.dragging { transition: none; }
+.mnav-head {
+  flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
+  padding: calc(1rem + env(safe-area-inset-top)) 1.1rem 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.mnav-logo { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; color: var(--white); }
+.mnav-close {
+  width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.2); background: transparent;
+  color: var(--white); font-size: 1.05rem; font-family: 'Space Mono', monospace;
+}
+.mnav-close:active { background: var(--acid); color: var(--black); border-color: var(--acid); }
+.mnav-body {
+  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column;
+}
+.mnav-list { list-style: none; }
+.mn-item {
+  position: relative; width: 100%; display: flex; align-items: center; gap: 1rem;
+  padding: 0.95rem 1.5rem; background: transparent; border: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: var(--white); text-align: left; transition: background 0.15s;
+}
+.mn-item:active { background: rgba(200,255,0,0.08); }
+.mn-n { width: 1.5rem; flex-shrink: 0; font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--gray); }
+.mn-t { flex: 1; font-size: 1.12rem; font-weight: 700; letter-spacing: 0.04em; }
+.mn-ar { font-family: 'Space Mono', monospace; color: var(--acid); opacity: 0.55; }
+.mn-item.cur { background: rgba(200,255,0,0.045); box-shadow: inset 3px 0 0 var(--acid); }
+.mn-item.cur .mn-n, .mn-item.cur .mn-t { color: var(--acid); }
+.mn-item.cur .mn-ar { opacity: 1; }
+.mnav-sub {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 0.1rem 1.5rem 1.1rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.mn-sub {
+  width: 100%; display: flex; align-items: center; gap: 0.8rem; text-align: left;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12);
+  color: var(--white); padding: 0.65rem 0.75rem; transition: background 0.15s, border-color 0.15s;
+}
+.mn-sub:active { background: rgba(200,255,0,0.1); border-color: var(--acid); }
+.mn-sub .ic {
+  width: 26px; height: 26px; flex-shrink: 0; border: 1px solid currentColor;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Space Mono', monospace; font-size: 0.68rem;
+}
+.mn-sub.travel { border-color: rgba(200,255,0,0.45); }
+.mn-sub.travel .ic { background: var(--acid); color: var(--black); border-color: var(--acid); }
+.mn-sub .tx { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.mn-sub .tx b { font-family: 'Space Mono', monospace; font-weight: 400; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.mn-sub .tx small { font-size: 0.68rem; color: var(--gray); font-weight: 300; }
+.mnav-foot {
+  margin-top: auto; padding: 1.4rem 1.5rem calc(1.2rem + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.mnav-lang { display: flex; border: 1px solid rgba(200,255,0,0.4); margin-bottom: 1rem; }
+.mnav-lang .lang-opt {
+  flex: 1; padding: 0.65rem; background: transparent; border: 0; color: var(--gray);
+  font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.14em;
+}
+.mnav-lang .lang-opt.active { background: var(--acid); color: var(--black); }
+.mnav-contact { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.mnav-contact a {
+  font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.04em;
+  color: var(--lgray); text-decoration: none; text-align: center;
+  border: 1px solid rgba(255,255,255,0.12); padding: 0.6rem 0.4rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mnav-contact a:active { border-color: var(--acid); color: var(--acid); }
+.mnav-contact a.wide { grid-column: span 2; }
+.mnav-copy { margin-top: 1rem; font-family: 'Space Mono', monospace; font-size: 0.55rem; color: var(--gray); letter-spacing: 0.06em; }
+.mnav.open .mn-anim { animation: mnIn 0.45s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(0.1s + var(--i, 0) * 0.045s); }
+@keyframes mnIn { from { opacity: 0; transform: translateX(-16px); } }
+
+/* 手机、iPad（含横屏）用侧边栏，桌面保留顶部导航 */
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+  .nav-links { display: none; }
+  .nav-burger { display: inline-flex; }
+}
+
+/* 打开抽屉时锁住背景滚动（iOS Safari 需要锁 html），抽屉内部滚动不外溢 */
+html:has(body.locked) { overflow: hidden; }
+.drawer-scroll, .travel-panel { overscroll-behavior: contain; }
+
+/* 统计数字：不让超宽数字把网格撑出屏幕 */
+.stats-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat { min-width: 0; }
+@media (max-width: 1280px) {
+  .stat { padding: 1.6rem 1.3rem; }
+  .stat-n { font-size: 2.8rem; }
+  .stat-n [data-i18n="stat_unit_day"] { font-size: 0.55em; margin-left: 0.08em; }
+  .stat-n { white-space: normal; }
+  .stat-n [data-i18n="stat_unit_day"] { display: inline-block; white-space: nowrap; }
+}
+
 /* REVEAL fallback (no-JS / reduced motion) */
 .rv { opacity: 0; transform: translateY(28px); }
 .no-anim .rv, .rv.in { opacity: 1; transform: none; }
@@ -865,7 +992,11 @@ button.tp-gh:hover { color: var(--white); }
   .hero { padding: 0 1.5rem 3rem; }
   .hero-body { max-width: 100%; }
   .hero-photo { display: none; }
-  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 3.5rem; }
+  .stat { padding: 1.4rem 1.1rem; }
+  .stat-n { font-size: clamp(2rem, 8.6vw, 2.8rem); white-space: normal; }
+  .stat-n [data-i18n="stat_unit_day"] { display: inline-block; }
+  .scroll-hint { display: none; }
   .pgrid { grid-template-columns: 1fr; }
   .pcard.wide { grid-column: span 1; grid-template-columns: 1fr; }
   .pcard.wide .pbignum { display: none; }
@@ -876,7 +1007,7 @@ button.tp-gh:hover { color: var(--white); }
   .exp-mid { display: none; }
   .exp-right { padding-left: 0; }
   /* drawer mobile */
-  .drawer { height: 92vh; max-height: 92vh; }
+  .drawer { height: 92vh; max-height: 92vh; height: 92dvh; max-height: 92dvh; }
   .drawer-top { padding: 0.6rem 1.4rem 1.3rem; }
   .drawer-scroll { padding: 1.8rem 1.4rem 3.5rem; }
   .d-flow { grid-template-columns: 1fr 1fr; }
@@ -887,7 +1018,7 @@ button.tp-gh:hover { color: var(--white); }
   #exp .sec-head { flex-wrap: wrap; row-gap: 1.2rem; }
   .exp-tabs { order: 4; width: 100%; }
   .exp-tab { flex: 1; justify-content: center; }
-  .travel-drawer { height: 92vh; max-height: 92vh; }
+  .travel-drawer { height: 92vh; max-height: 92vh; height: 92dvh; max-height: 92dvh; }
   .travel-body { grid-template-columns: 1fr; grid-template-rows: 52% 1fr; }
   .travel-panel { border-left: 0; border-top: 1px solid rgba(255,255,255,0.08); padding: 1.2rem 1.4rem 2.5rem; }
   .travel-drawer.no-map .travel-panel { padding: 1.4rem 1.4rem 2.5rem; }
@@ -897,6 +1028,8 @@ button.tp-gh:hover { color: var(--white); }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .mnav, .mnav-overlay { transition: none !important; }
+  .mnav.open .mn-anim { animation: none; }
 }
 </style>
 </head>
@@ -908,7 +1041,10 @@ button.tp-gh:hover { color: var(--white); }
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">YAN.BRIANKUN</a>
+  <div class="nav-left">
+    <button class="nav-burger" id="mnavBtn" type="button" aria-label="打开菜单" aria-controls="mnav" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a href="#" class="nav-logo">YAN.BRIANKUN</a>
+  </div>
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="#work" data-i18n="nav_work">作品</a></li>
@@ -935,6 +1071,50 @@ button.tp-gh:hover { color: var(--white); }
     </button>
   </div>
 </nav>
+
+<!-- ============ 手机 / iPad 侧边栏 ============ -->
+<div class="mnav-overlay" id="mnavOverlay"></div>
+<aside class="mnav" id="mnav" role="dialog" aria-modal="true" aria-label="网站导航" aria-hidden="true">
+  <div class="mnav-head">
+    <span class="mnav-logo">YAN.BRIANKUN</span>
+    <button class="mnav-close" id="mnavClose" type="button" aria-label="关闭菜单">✕</button>
+  </div>
+  <div class="mnav-body">
+    <ul class="mnav-list">
+      <li class="mn-anim" style="--i:0"><button type="button" class="mn-item" data-mgo="work"><span class="mn-n">01</span><span class="mn-t" data-i18n="nav_work">作品</span><span class="mn-ar">→</span></button></li>
+      <li class="mn-anim" style="--i:1">
+        <button type="button" class="mn-item" data-mgo="exp"><span class="mn-n">02</span><span class="mn-t" data-i18n="nav_exp">经历</span><span class="mn-ar">→</span></button>
+        <div class="mnav-sub">
+          <button type="button" class="mn-sub" data-mgo="exp">
+            <span class="ic">01</span>
+            <span class="tx"><b data-i18n="dd_work">工作经历</b><small data-i18n="dd_work_s">实习与全职 · 6 段</small></span>
+          </button>
+          <button type="button" class="mn-sub travel" data-mgo="travel">
+            <span class="ic">✈&#xFE0E;</span>
+            <span class="tx"><b data-i18n="dd_travel">旅行经历</b><small data-i18n="dd_travel_s"><span class="js-ncountry">30</span> 个国家 · 足迹地图</small></span>
+          </button>
+        </div>
+      </li>
+      <li class="mn-anim" style="--i:2"><button type="button" class="mn-item" data-mgo="skills"><span class="mn-n">03</span><span class="mn-t" data-i18n="nav_skills">技能</span><span class="mn-ar">→</span></button></li>
+      <li class="mn-anim" style="--i:3"><button type="button" class="mn-item" data-mgo="about"><span class="mn-n">04</span><span class="mn-t" data-i18n="nav_about">关于</span><span class="mn-ar">→</span></button></li>
+      <li class="mn-anim" style="--i:4"><button type="button" class="mn-item" data-mgo="contact"><span class="mn-n">05</span><span class="mn-t" data-i18n="nav_contact">联系</span><span class="mn-ar">→</span></button></li>
+    </ul>
+    <div class="mnav-foot mn-anim" style="--i:5">
+      <div class="mnav-lang" role="group" aria-label="Language">
+        <button type="button" class="lang-opt" data-lang="zh">中文</button>
+        <button type="button" class="lang-opt" data-lang="en">EN</button>
+      </div>
+      <div class="mnav-contact">
+        <a href="mailto:briankun2022@163.com" class="wide">briankun2022@163.com</a>
+        <a href="tel:+8615772288557" class="wide">157-7228-8557</a>
+        <a href="https://www.xiaoyuzhoufm.com/podcast/695b427fbf09b17285d3e096" target="_blank" rel="noopener" data-i18n="contact_podcast">小宇宙 播客</a>
+        <a href="https://xhslink.cn/m/38jP0KqAzez" target="_blank" rel="noopener" data-i18n="contact_xhs">小红书 主页</a>
+      </div>
+      <div class="mnav-copy">© 2026 严哲堃 Brian Yan</div>
+    </div>
+  </div>
+</aside>
+
 
 <!-- HERO -->
 <section class="hero">
@@ -2884,6 +3064,100 @@ navDD.querySelectorAll('.nav-menu button').forEach(b => {
 });
 document.getElementById('expTravelTab').addEventListener('click', () => openTravel());
 
+/* ---------- 手机 / iPad 侧边栏 ---------- */
+const mnav = document.getElementById('mnav');
+const mnavOv = document.getElementById('mnavOverlay');
+const mnavBtn = document.getElementById('mnavBtn');
+const MNAV_MQ = window.matchMedia('(max-width: 1024px), (hover: none) and (pointer: coarse)');
+let mnavLast = null;
+const mnavIsOpen = () => mnav.classList.contains('open');
+const otherDrawerOpen = () =>
+  drawer.getAttribute('aria-hidden') === 'false' || tDrawer.getAttribute('aria-hidden') === 'false';
+
+function markCurrentSection(){
+  let cur = null;
+  const line = window.innerHeight * 0.35;
+  ['work', 'exp', 'skills', 'about', 'contact'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top <= line) cur = id;
+  });
+  mnav.querySelectorAll('.mn-item').forEach(b => b.classList.toggle('cur', b.dataset.mgo === cur));
+}
+function openMnav(){
+  if (mnavIsOpen()) return;
+  mnavLast = document.activeElement;
+  markCurrentSection();
+  mnav.style.transform = '';
+  mnav.classList.add('open');
+  mnavOv.classList.add('open');
+  mnav.setAttribute('aria-hidden', 'false');
+  mnavBtn.setAttribute('aria-expanded', 'true');
+  mnavBtn.setAttribute('aria-label', LANG === 'en' ? 'Close menu' : '关闭菜单');
+  document.body.classList.add('locked');
+  document.getElementById('mnavClose').focus({ preventScroll: true });
+}
+function closeMnav(restoreFocus = true){
+  if (!mnavIsOpen()) return;
+  mnav.classList.remove('open', 'dragging');
+  mnav.style.transform = '';
+  mnavOv.classList.remove('open');
+  mnavOv.style.opacity = '';
+  mnav.setAttribute('aria-hidden', 'true');
+  mnavBtn.setAttribute('aria-expanded', 'false');
+  mnavBtn.setAttribute('aria-label', LANG === 'en' ? 'Open menu' : '打开菜单');
+  if (!otherDrawerOpen()) document.body.classList.remove('locked');
+  if (restoreFocus && mnavLast) mnavLast.focus({ preventScroll: true });
+}
+mnavBtn.addEventListener('click', () => (mnavIsOpen() ? closeMnav() : openMnav()));
+document.getElementById('mnavClose').addEventListener('click', () => closeMnav());
+mnavOv.addEventListener('click', () => closeMnav());
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMnav(); });
+MNAV_MQ.addEventListener('change', e => { if (!e.matches) closeMnav(false); }); // 转成桌面宽度时自动收起
+
+mnav.addEventListener('click', e => {
+  const lang = e.target.closest('.mnav-lang .lang-opt');
+  if (lang) {
+    if (lang.dataset.lang !== LANG) applyLang(lang.dataset.lang, true);
+    mnavBtn.setAttribute('aria-label', LANG === 'en' ? 'Close menu' : '关闭菜单');
+    return;
+  }
+  const b = e.target.closest('[data-mgo]');
+  if (!b) return;
+  const go = b.dataset.mgo;
+  closeMnav(false);
+  if (go === 'travel') { setTimeout(() => openTravel(), prefersReduced ? 0 : 260); return; }
+  const el = document.getElementById(go);
+  if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' }));
+});
+/* 向左滑动关闭 */
+(function(){
+  let x0 = null, y0 = 0, dx = 0, horiz = null;
+  const w = () => mnav.offsetWidth || 1;
+  mnav.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; horiz = null;
+  }, { passive: true });
+  mnav.addEventListener('touchmove', e => {
+    if (x0 === null) return;
+    const mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
+    if (horiz === null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) horiz = Math.abs(mx) > Math.abs(my);
+    if (!horiz) return;
+    dx = Math.min(0, mx);
+    mnav.classList.add('dragging');
+    mnav.style.transform = `translateX(${dx}px)`;
+    mnavOv.style.opacity = String(1 + dx / w());
+  }, { passive: true });
+  mnav.addEventListener('touchend', () => {
+    if (x0 === null) return;
+    x0 = null;
+    if (!horiz) return;
+    mnav.classList.remove('dragging');
+    mnavOv.style.opacity = '';
+    if (dx < -Math.min(80, w() * 0.25)) closeMnav();
+    else mnav.style.transform = '';
+  });
+})();
+
 /* 动态元素也套用自定义光标的放大效果 */
 if (window.matchMedia('(pointer: fine)').matches) {
   const cDot = document.getElementById('curDot'), cRing = document.getElementById('curRing');
@@ -2912,7 +3186,7 @@ if (window.matchMedia('(pointer: fine)').matches) {
    ============================================================ */
 const I18N = {
   // nav
-  nav_work:'WORK', nav_exp:'EXPERIENCE', nav_about:'ABOUT', nav_contact:'CONTACT',
+  nav_work:'WORK', nav_exp:'EXPERIENCE', nav_about:'ABOUT', nav_contact:'CONTACT', nav_skills:'SKILLS',
   dd_work:'Work', dd_work_s:'Internships &amp; full-time · 6 roles',
   dd_travel:'Travel', dd_travel_s:'<span class="js-ncountry">30</span> countries · footprint map',
   exp_tab_work:'Work', exp_tab_travel:'Travel',
@@ -3032,7 +3306,7 @@ function applyLang(lang, animate){
   // ticker 文案随语言（英文本身通用，这里保持不变）
 
   // 语言开关高亮
-  document.querySelectorAll('#langToggle .lang-opt').forEach(o => {
+  document.querySelectorAll('#langToggle .lang-opt, .mnav-lang .lang-opt').forEach(o => {
     o.classList.toggle('active', o.dataset.lang === lang);
   });
 
@@ -3065,7 +3339,7 @@ document.getElementById('langToggle').addEventListener('click', () => {
 /* 初始应用（若本地存储为 en 则直接切） */
 if (LANG === 'en') applyLang('en', false);
 else {
-  document.querySelectorAll('#langToggle .lang-opt').forEach(o => {
+  document.querySelectorAll('#langToggle .lang-opt, .mnav-lang .lang-opt').forEach(o => {
     o.classList.toggle('active', o.dataset.lang === 'zh');
   });
 }
