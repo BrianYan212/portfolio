@@ -96,7 +96,7 @@ nav {
 .hero {
   min-height: 100vh;
   display: flex; align-items: flex-end;
-  padding: 0 3rem 5rem;
+  padding: 7.5rem 3rem 5rem;   /* 顶部留出固定导航的高度，窗口矮时内容不会钻到导航下面 */
   position: relative; overflow: hidden;
 }
 .hero-bg-word {
@@ -132,7 +132,7 @@ nav {
 }
 .hero-name {
   font-family: 'Bebas Neue', 'Arial Black', Impact, sans-serif;
-  font-size: clamp(72px, 11vw, 160px);
+  font-size: clamp(64px, min(11vw, 17vh), 160px);   /* 随窗口高度缩放，英文两行名字也放得下 */
   line-height: 0.9; letter-spacing: -0.01em; margin-bottom: 1.8rem;
 }
 .hero-name .ac { color: var(--acid); }
@@ -710,6 +710,15 @@ footer span {
   animation: tmSpin 0.8s linear infinite;
 }
 @keyframes tmSpin { to { transform: rotate(360deg); } }
+.tm-loading.err { flex-direction: column; gap: 0.7rem; padding: 1.5rem; text-align: center; letter-spacing: 0.04em; }
+.tm-err-t { font-family: 'Noto Sans SC', 'PingFang SC', sans-serif; font-size: 1rem; font-weight: 700; color: var(--white); letter-spacing: 0.02em; }
+.tm-err-d { font-family: 'Noto Sans SC', 'PingFang SC', sans-serif; font-size: 0.78rem; line-height: 1.6; color: var(--lgray); max-width: 340px; letter-spacing: 0; }
+.tm-retry {
+  margin-top: 0.3rem; font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em;
+  background: var(--acid); color: var(--black); border: 0; padding: 0.6rem 1.2rem;
+}
+.tm-retry:hover { background: var(--white); }
+.tm-err-c { font-size: 0.55rem; color: var(--gray); letter-spacing: 0.06em; }
 
 /* 地图光点 / 标签（HTML 叠加层，.gm 是零尺寸锚点，位置随视图更新） */
 .gm { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 2; }
@@ -969,6 +978,15 @@ button.tp-gh:hover { color: var(--white); }
 html:has(body.locked) { overflow: hidden; }
 .drawer-scroll, .travel-panel { overscroll-behavior: contain; }
 
+/* 窗口较矮时：首屏收紧，隐藏 SCROLL 提示避免压到标签 */
+@media (max-height: 780px) and (min-width: 901px) {
+  .hero { padding-bottom: 3rem; }
+  .hero-eyebrow { margin-bottom: 1rem; }
+  .hero-name { margin-bottom: 1.2rem; }
+  .hero-desc { margin-bottom: 1.6rem; }
+  .scroll-hint { display: none; }
+}
+
 /* 统计数字：不让超宽数字把网格撑出屏幕 */
 .stats-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .stat { min-width: 0; }
@@ -989,7 +1007,8 @@ html:has(body.locked) { overflow: hidden; }
   nav { padding: 1rem 1.5rem; }
   .nav-links { display: none; }
   .sec { padding: 4rem 1.5rem; }
-  .hero { padding: 0 1.5rem 3rem; }
+  .hero { padding: 6rem 1.5rem 3rem; }
+  .hero-name { font-size: clamp(64px, 18vw, 120px); }
   .hero-body { max-width: 100%; }
   .hero-photo { display: none; }
   .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 3.5rem; }
@@ -2954,30 +2973,76 @@ new ResizeObserver(() => {
   applyView(); scheduleLayout();
 }).observe(tMapWrap);
 
-/* ---------- 加载地图数据（打开抽屉时才加载，不影响首屏） ---------- */
-function loadMapData(){
-  if (!loadMapData._p) {
-    loadMapData._p = fetch('travel-map.json').then(r => {
+/* ---------- 加载地图数据（打开抽屉时才加载，不影响首屏） ----------
+   - 带版本号：每次更新地图数据就改 MAP_VER，避开浏览器 / CDN 里的旧缓存（包括上传前缓存下来的 404）
+   - 失败自动重试一次（强制绕过缓存），仍失败则在地图区显示原因 + 重新加载按钮，不再一直卡在失败状态 */
+const MAP_VER = '20261124c';
+function mapURL(bust){
+  let base = location.href.split('#')[0].split('?')[0];
+  if (!/\/$/.test(base) && !/\.[a-z0-9]+$/i.test(base)) base += '/';   // 兼容 …/portfolio 不带斜杠
+  return new URL('travel-map.json?v=' + MAP_VER + (bust ? '&r=' + Date.now() : ''), base).href;
+}
+function fetchMapOnce(bust){
+  const ctrl = window.AbortController ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(() => ctrl.abort(), 25000) : 0;
+  return fetch(mapURL(bust), { cache: bust ? 'reload' : 'no-cache', signal: ctrl ? ctrl.signal : undefined })
+    .then(r => {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
-    });
+    })
+    .then(d => {
+      if (!d || !d.c || !d.rest) throw new Error('bad data');
+      return d;
+    })
+    .catch(e => { throw new Error(e.name === 'AbortError' ? 'timeout' : (e.message || String(e))); })
+    .finally(() => clearTimeout(timer));
+}
+function loadMapData(){
+  if (!loadMapData._p) {
+    loadMapData._p = fetchMapOnce(false)
+      .catch(() => fetchMapOnce(true))
+      .catch(e => { loadMapData._p = null; throw e; });
   }
   return loadMapData._p;
 }
+function setMapLoading(){
+  tLoading.classList.remove('hide', 'err');
+  tLoading.innerHTML = '<span class="tm-spin"></span>LOADING MAP';
+}
+function setMapError(msg){
+  const zh = LANG !== 'en';
+  tLoading.classList.remove('hide');
+  tLoading.classList.add('err');
+  tLoading.innerHTML =
+    `<div class="tm-err-t">${zh ? '地图没加载出来' : "Map didn't load"}</div>` +
+    `<div class="tm-err-d">${zh ? '可能是网络波动或缓存，点一下重新加载；下面的国家列表可以照常使用。' : 'Probably a network or cache hiccup. Tap to retry — the country list below still works.'}</div>` +
+    `<button type="button" class="tm-retry" id="tmRetry">↻ ${zh ? '重新加载' : 'Retry'}</button>` +
+    `<div class="tm-err-c">${msg}</div>`;
+  document.getElementById('tmRetry').addEventListener('click', initMap);
+}
 function initMap(){
   mapState = 'loading';
+  setMapLoading();
+  tDrawer.classList.remove('no-map');
   loadMapData().then(data => {
-    cw = tMapWrap.clientWidth || cw; ch = tMapWrap.clientHeight || ch;
-    buildMap(data);
-    mapState = 'ready';
-    vb = worldView(); applyView();
-    setTimeout(() => tLoading.classList.add('hide'), 200);
-    if (pendingEnter) { const f = pendingEnter; pendingEnter = null; f(); }
-    else if (tView.mode === 'world') buildWorldPins();
+    try {
+      cw = tMapWrap.clientWidth || cw; ch = tMapWrap.clientHeight || ch;
+      buildMap(data);
+      mapState = 'ready';
+      vb = worldView(); applyView();
+      setTimeout(() => tLoading.classList.add('hide'), 200);
+      renderTravelPanel();
+      if (pendingEnter) { const f = pendingEnter; pendingEnter = null; f(); }
+      else if (tView.mode === 'world') buildWorldPins();
+      else if (tView.mode === 'region') enterRegion(tView.rid);
+      else enterCountry(tView.cid);
+    } catch (e) {
+      throw new Error('render: ' + (e.message || e));
+    }
   }).catch(err => {
-    console.warn('[travel]', err.message);
+    console.warn('[travel] map failed:', err.message);
     mapState = 'failed';
-    tDrawer.classList.add('no-map');
+    setMapError(err.message);
     renderTravelPanel();
   });
 }
@@ -3008,7 +3073,7 @@ function openTravel(target){
     tView = { mode: 'world', cid: null, rid: null };
     syncUI();
   }
-  if (mapState === 'idle') { initMap(); return; }
+  if (mapState === 'idle' || mapState === 'failed') { initMap(); return; }
   if (mapState !== 'ready') return;
   if (pendingEnter) { const f = pendingEnter; pendingEnter = null; f(); }
   else if (!wasOpen) { buildWorldPins(); vb = worldView(); applyView(); }
@@ -3161,7 +3226,7 @@ mnav.addEventListener('click', e => {
 /* 动态元素也套用自定义光标的放大效果 */
 if (window.matchMedia('(pointer: fine)').matches) {
   const cDot = document.getElementById('curDot'), cRing = document.getElementById('curRing');
-  const sel = '.tp-chip, .tp-cities button, .tp-back, button.tp-gh, .tm-back, .tm-zoom button, .gm-btn, .tm-c, .exp-tab, .nav-menu button';
+  const sel = '.tp-chip, .tp-cities button, .tp-back, button.tp-gh, .tm-back, .tm-zoom button, .tm-retry, .gm-btn, .tm-c, .exp-tab, .nav-menu button';
   const grow = () => { cDot.style.width = cDot.style.height = '6px'; cRing.style.width = cRing.style.height = '54px'; cRing.style.opacity = '0.7'; };
   const shrink = () => { cDot.style.width = cDot.style.height = '10px'; cRing.style.width = cRing.style.height = '36px'; cRing.style.opacity = '0.45'; };
   document.addEventListener('mouseover', e => { if (e.target.closest && e.target.closest(sel)) grow(); });
